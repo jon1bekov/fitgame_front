@@ -65,23 +65,22 @@
         }
 
         // BOTGA MA'LUMOT YUBORISH FUNKSIYASI
-        function finishWorkout() {
-            if (count === 0) {
-                alert("Kamida 1 marta mashq qilishingiz kerak!");
-                return;
-            }
-
-            const data = {
-                reps: count,
-                type: "squat"
-            };
-
-            // Botga JSON formatda yuborish b
-            tg.sendData(JSON.stringify(data));
-            
-            // Ilovani yopish
-            tg.close();
+        function finishWorkout() {  
+        try {
+        const data = { reps: count, type: "squat" };
+        const json_data = JSON.stringify(data);
+        
+        // Botga yuborish
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.sendData(json_data);
+            window.Telegram.WebApp.close();
+        } else {
+            alert("Telegram WebApp topilmadi!");
         }
+        } catch (e) {
+        alert("Xatolik: " + e.message);
+        }
+    }
     </script>
 </body>
 </html>
