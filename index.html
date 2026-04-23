@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Squat AI - Datchik</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
+        .counter { font-size: 80px; font-weight: bold; color: #00d2ff; margin-top: 50px; }
+        .status { font-size: 24px; color: #aaa; margin-bottom: 20px; }
+        .btn { background: #00d2ff; color: black; border: none; padding: 15px 30px; font-size: 18px; border-radius: 10px; cursor: pointer; }
+        .instruction { font-size: 14px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Squat Tracker</h2>
+    <div class="status" id="status">Tayyor bo'ling...</div>
+    <div class="counter" id="counter">0</div>
+    <p class="instruction">Telefonni vertikal holatda cho'ntagingizga soling yoki qo'lingizda tuting.</p>
+    <br>
+    <button class="btn" onclick="startTracking()">Mashqni boshlash</button>
+
+    <script>
+        let count = 0;
+        let stage = "up";
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Mini Appni to'liq ekranga yoyish
+
+        function startTracking() {
+            document.getElementById("status").innerText = "Harakatni boshlang!";
+            
+            // Datchiklardan ma'lumot olishni boshlash
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS (iPhone) uchun ruxsat so'rash
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response == 'granted') {
+                        window.addEventListener("deviceorientation", handleMotion);
+                    }
+                });
+            } else {
+                // Android va boshqalar uchun
+                window.addEventListener("deviceorientation", handleMotion);
+            }
+        }
+
+        function handleMotion(event) {
+            let angle = event.beta; // Telefonning oldinga/orqaga egilish burchagi
+
+            // Mantiq: 
+            // Agar burchak 70 dan oshsa (o'tirdi) - status 'down'
+            // Agar burchak 30 dan kamaysa va oldin 'down' bo'lgan bo'lsa (turdi) - count++
+            if (angle > 70) {
+                stage = "down";
+                document.getElementById("status").innerText = "O'tirdingiz!";
+            }
+            
+            if (angle < 30 && stage === "down") {
+                count++;
+                stage = "up";
+                document.getElementById("status").innerText = "Yaxshi! Turdingiz.";
+                document.getElementById("counter").innerText = count;
+                
+                // Har bir squatda telefon bir silkinadi (vibratsiya)
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function finishWorkout() {
+        const data = {
+            reps: count,
+            type: "squat"
+        };
+        // Telegramga ma'lumotni JSON formatda yuboramiz
+        tg.sendData(JSON.stringify(data));
+        tg.close(); // Ilovani yopish
+        }
+    </script>
+</body>
+</html>
