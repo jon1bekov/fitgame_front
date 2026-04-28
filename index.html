@@ -3,6 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitGame AI</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #0a0a0c;
+            --card-bg: #16161a;
+            --text-main: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif; /* Futuristik shrift (tizimda bo'lsa) */
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fon uchun neon effektlar */
+        .bg-glow {
+            position: fixed;
+            top: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: var(--neon-blue);
+            filter: blur(120px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            padding-bottom: 90px;
+        }
+
+        .active { display: flex; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* JONLI PERSONAJ */
+        .character-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 20px 0;
+            background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .char-svg {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        /* STATS CARD */
+        .glass-card {
+            background: rgba(22, 22, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 90%;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .level-bar {
+            width: 100%;
+            height: 8px;
+            background: #222;
+            border-radius: 4px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* BUTTONS */
+        .neon-btn {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .neon-btn:active {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        /* NAVIGATION */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 75px;
+            background: rgba(10, 10, 12, 0.95);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #555;
+            font-size: 10px;
+            text-decoration: none;
+        }
+
+        .nav-link.active { color: var(--neon-blue); }
+        .nav-link svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <div id="profile" class="page active">
+        <h2 style="letter-spacing: 3px; color: var(--neon-blue);">FITGAME PLAYER</h2>
+        
+        <div class="character-container">
+            <svg class="char-svg" viewBox="0 0 100 100">
+                <circle cx="50" cy="30" r="15" fill="none" stroke="#00f2ff" stroke-width="2"/>
+                <path d="M50 45 L50 70 M30 55 L70 55 M50 70 L35 90 M50 70 L65 90" stroke="#00f2ff" stroke-width="2" fill="none"/>
+                <circle cx="50" cy="30" r="5" fill="#00f2ff">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
+                </circle>
+            </svg>
+        </div>
+
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between;">
+                <span>LVL: 01</span>
+                <span style="color: var(--neon-purple);">RANK: NOVICE</span>
+            </div>
+            <div class="level-bar">
+                <div class="level-progress" style="width: 45%;"></div>
+            </div>
+            <p style="font-size: 12px; color: #888; margin-top: 10px;">XP: 450 / 1000 to Next Level</p>
+        </div>
+
+        <div class="glass-card" style="display: flex; justify-content: space-around; text-align: center;">
+            <div><small>SQUATS</small><br><b style="color: var(--neon-blue);">124</b></div>
+            <div><small>PUSHUPS</small><br><b style="color: var(--neon-blue);">0</b></div>
+            <div><small>DAYS</small><br><b style="color: var(--neon-blue);">3</b></div>
+        </div>
+    </div>
+
+    <div id="workout" class="page">
+        <h2 style="color: var(--neon-purple);">SQUAT MODE</h2>
+        <div style="font-size: 100px; font-weight: bold; margin: 40px 0; text-shadow: 0 0 20px var(--neon-blue);" id="count">0</div>
+        
+        <div class="glass-card" id="status" style="text-align: center; color: #888;">TAYYORMISIZ?</div>
+
+        <button class="neon-btn" id="start-btn" onclick="startGame()">START MISSION</button>
+        <button class="neon-btn" id="finish-btn" style="display:none; border-color: var(--neon-purple); color: var(--neon-purple);" onclick="endGame()">FINISH & SAVE</button>
+    </div>
+
+    <div id="leaderboard" class="page">
+        <h2 style="color: var(--neon-blue);">TOP PLAYERS</h2>
+        <div class="glass-card" style="width: 100%;">
+            <div style="display:flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #333;">
+                <span>1. JOXADEVELOP</span> <span>2500 XP</span>
+            </div>
+            <div style="display:flex; justify-content: space-between; padding: 10px 0;">
+                <span>2. BEKZOD_AI</span> <span>1800 XP</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-link active" onclick="showPage('profile', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            PROFILE
+        </div>
+        <div class="nav-link" onclick="showPage('workout', this)">
+            <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14 4.14 5.57 2 7.71 3.43 9.14 2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22 14.86 20.57 17 18.43 19.14 20.57 20.57 19.14 19.14 17 21.29 14.86z"/></svg>
+            TRAIN
+        </div>
+        <div class="nav-link" onclick="showPage('leaderboard', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+            RANK
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let squatCount = 0;
+        let isActive = false;
+        let stage = "up";
+
+        function showPage(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            stopMotion();
+        }
+
+        function startGame() {
+            squatCount = 0;
+            document.getElementById('count').innerText = 0;
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('finish-btn').style.display = 'block';
+            isActive = true;
+            
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(res => {
+                    if (res == 'granted') window.addEventListener('deviceorientation', handleSquat);
+                });
+            } else {
+                window.addEventListener('deviceorientation', handleSquat);
+            }
+        }
+
+        function stopMotion() {
+            isActive = false;
+            window.removeEventListener('deviceorientation', handleSquat);
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('finish-btn').style.display = 'none';
+        }
+
+        function handleSquat(event) {
+            if (!isActive) return;
+            let beta = event.beta;
+
+            if (beta > 75) {
+                if (stage === "up") {
+                    stage = "down";
+                    document.getElementById('status').innerText = "GO DOWN... ✅";
+                    document.getElementById('status').style.color = "#00f2ff";
+                }
+            }
+            
+            if (beta < 40 && stage === "down") {
+                squatCount++;
+                stage = "up";
+                document.getElementById('count').innerText = squatCount;
+                document.getElementById('status').innerText = "KEEP GOING! 🔥";
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function endGame() {
+            tg.sendData(JSON.stringify({ reps: squatCount, type: 'squat' }));
+            tg.close();
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FitGame - AI Squat</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -120,7 +419,7 @@
         }
     </script>
 </body>
-</html>
+</html> -->
 
 
 
