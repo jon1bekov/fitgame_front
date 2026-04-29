@@ -1,134 +1,127 @@
 const tg = window.Telegram.WebApp;
-tg.expand();
+const videoElement = document.getElementById('input_video');
+const canvasElement = document.getElementById('output_canvas');
+const canvasCtx = canvasElement.getContext('2d');
+const statusElement = document.getElementById('status');
 
-// Mashq o'zgaruvchilari
-let squatCount = 0;
+let count = 0;
+let stage = "up"; 
 let isActive = false;
-let stage = "up"; // "up" yoki "down"
-let lastStepTime = 0; 
 
-// Sozlamalar (Anti-cheat)
-const MIN_SQUAT_TIME = 800; // 0.8 soniyadan tez harakatlar hisoblanmaydi
-const GO_DOWN_LIMIT = 75;   // Pastga tushish burchagi
-const GO_UP_LIMIT = 35;     // Yuqoriga chiqish burchagi
+// 1. Burchakni hisoblash (Bel-Tizza-To'piq)
+function calculateAngle(a, b, c) {
+    const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+    let angle = Math.abs(radians * 180.0 / Math.PI);
+    if (angle > 180.0) angle = 360 - angle;
+    return angle;
+}
 
-// Sahifalar navigatsiyasi
+// 2. AI natijalarini qayta ishlash
+function onResults(results) {
+    if (!results.poseLandmarks || !isActive) return;
+
+    // Canvasni tozalash va chizish
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+    // Bo'g'inlarni chizish (Vizual ko'rinish uchun)
+    if (results.poseLandmarks) {
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
+        drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#FF0000', lineWidth: 2});
+    }
+
+    const landmarks = results.poseLandmarks;
+    const hip = landmarks[23];   // Bel
+    const knee = landmarks[25];  // Tizza
+    const ankle = landmarks[27]; // To'piq
+
+    const angle = calculateAngle(hip, knee, ankle);
+    document.getElementById('angle-text').innerText = `Angle: ${Math.round(angle)}°`;
+
+    // 3. Squat Logikasi (Anti-Cheat mantiqi bilan)
+    if (angle > 160) {
+        if (stage === "down") {
+            statusElement.innerText = "YAXSHI! YANA... 🔥";
+            statusElement.style.color = "#00ff88";
+        }
+        stage = "up";
+    }
+    
+    if (angle < 100 && stage === "up") { // 90 gradusdan biroz yumshoqroq 100 qildik
+        stage = "down";
+        count++;
+        document.getElementById('count').innerText = count;
+        statusElement.innerText = "KO'TARILING! ⬆️";
+        statusElement.style.color = "#00f2ff";
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+    canvasCtx.restore();
+}
+
+// 4. MediaPipe Pose Sozlamalari
+const pose = new Pose({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+});
+
+pose.setOptions({
+    modelComplexity: 1,
+    smoothLandmarks: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6
+});
+
+pose.onResults(onResults);
+
+// 5. Kamera boshqaruvi
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        if (isActive) {
+            await pose.send({image: videoElement});
+        }
+    },
+    width: 480,
+    height: 480
+});
+
+// 6. Tugmalar uchun funksiyalar
+function startGame() {
+    isActive = true;
+    count = 0;
+    document.getElementById('count').innerText = "0";
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('finish-btn').style.display = 'block';
+    statusElement.innerText = "KAMERA OLDIDA TURING";
+    
+    camera.start().catch(err => {
+        statusElement.innerText = "KAMERA XATOSI! ⚠️";
+        console.error(err);
+    });
+}
+
+function endGame() {
+    isActive = false;
+    if (count > 0) {
+        tg.sendData(JSON.stringify({ 
+            reps: count, 
+            type: 'squat_ai',
+            xp: count * 15 // AI bilan qilingani uchun ko'proq XP
+        }));
+        tg.close();
+    } else {
+        alert("Siz hali mashq qilmadingiz!");
+        location.reload(); // Sahifani qayta yuklash
+    }
+}
+
+// Sahifalar navigatsiyasi (Avvalgi koddan)
 function showPage(pageId, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     el.classList.add('active');
-    if (pageId !== 'workout') stopMotion();
-}
-
-// Mashqni boshlash
-function startGame() {
-    squatCount = 0;
-    document.getElementById('count').innerText = 0;
-    document.getElementById('start-btn').style.display = 'none';
-    document.getElementById('finish-btn').style.display = 'block';
-    isActive = true;
-    stage = "up";
     
-    // Sensorlarga ruxsat olish (iOS uchun muhim)
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(res => {
-                if (res === 'granted') {
-                    window.addEventListener('deviceorientation', handleSquat);
-                } else {
-                    alert("Sensorlarga ruxsat berilmadi!");
-                }
-            })
-            .catch(e => console.error(e));
-    } else {
-        window.addEventListener('deviceorientation', handleSquat);
+    if (pageId !== 'workout') {
+        isActive = false;
     }
 }
-
-// Sensorni to'xtatish
-function stopMotion() {
-    isActive = false;
-    window.removeEventListener('deviceorientation', handleSquat);
-    document.getElementById('start-btn').style.display = 'block';
-    document.getElementById('finish-btn').style.display = 'none';
-    document.getElementById('status').innerText = "TAYYORMISIZ?";
-    document.getElementById('status').style.color = "#888";
-}
-
-// Harakatni qayta ishlash (Asosiy mantiq)
-function handleSquat(event) {
-    if (!isActive) return;
-
-    let beta = event.beta; // Telefonning egilish burchagi
-    let currentTime = new Date().getTime();
-
-    // 1. PASTGA HARAKAT (Checkpoint)
-    if (beta > GO_DOWN_LIMIT) {
-        if (stage === "up") {
-            stage = "down";
-            document.getElementById('status').innerText = "PASTGA... ✅";
-            document.getElementById('status').style.color = "#00f2ff";
-            tg.HapticFeedback.impactOccurred('light');
-        }
-    }
-
-    // 2. YUQORIGA HARAKAT (Hisoblash)
-    if (beta < GO_UP_LIMIT && stage === "down") {
-        // ANTI-CHEAT: Vaqtni tekshiramiz
-        if (currentTime - lastStepTime > MIN_SQUAT_TIME) {
-            squatCount++;
-            stage = "up";
-            lastStepTime = currentTime;
-
-            // UI ni yangilash
-            document.getElementById('count').innerText = squatCount;
-            document.getElementById('status').innerText = "BARAKALLA! 🔥";
-            document.getElementById('status').style.color = "#00ff88";
-
-            // Vibratsiya (Muvaffaqiyatli takrorlash)
-            tg.HapticFeedback.notificationOccurred('success');
-        } else {
-            // Agar juda tez siltalsa (Cheat harakati)
-            document.getElementById('status').innerText = "JUDA TEZ! SEKINROQ... ⚠️";
-            document.getElementById('status').style.color = "#ff9900";
-            tg.HapticFeedback.notificationOccurred('error');
-            stage = "up"; // Ochko bermasdan holatni qaytaramiz
-        }
-    }
-}
-
-// Mashqni tugatish va ma'lumotni BOTga yuborish
-function endGame() {
-    if (squatCount > 0) {
-        // Botga JSON formatida ma'lumot ketadi
-        const resultData = {
-            type: 'squat',
-            reps: squatCount,
-            xp: squatCount * 10, // Har biriga 10 XP
-            timestamp: new Date().toISOString()
-        };
-
-        // Telegramga yuborish
-        tg.sendData(JSON.stringify(resultData));
-        
-        // Ilovani yopish
-        tg.close();
-    } else {
-        alert("Siz hali birorta ham takrorlash bajarmadingiz!");
-    }
-}
-
-// Ilova yuklanganda URL parametrlarini o'qish (Agar botdan ma'lumot kelsa)
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const userXP = urlParams.get('xp') || 0;
-    const userLVL = urlParams.get('lvl') || 1;
-
-    // Profil sahifasidagi ma'lumotlarni yangilash
-    const xpText = document.querySelector('p[style*="color: #888"]');
-    if (xpText) xpText.innerText = `XP: ${userXP} / 1000`;
-    
-    const lvlText = document.querySelector('.stats-card span:nth-child(1)');
-    if (lvlText) lvlText.innerText = `LVL: ${userLVL}`;
-};

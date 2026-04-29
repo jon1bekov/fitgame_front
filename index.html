@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FitGame AI</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Telegram API birinchi yuklanishi shart -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
     <div class="bg-glow"></div>
 
+    <!-- PROFILE PAGE -->
     <div id="profile" class="page active">
         <h2 style="letter-spacing: 3px; color: var(--neon-blue);">FITGAME PLAYER</h2>
         <div class="character-container">
@@ -24,58 +26,63 @@
         </div>
         <div class="glass-card">
             <div style="display: flex; justify-content: space-between;">
-                <span>LVL: 01</span>
-                <span style="color: var(--neon-purple);">RANK: NOVICE</span>
+                <span id="lvl-display">LVL: 01</span>
+                <span id="rank-display" style="color: var(--neon-purple);">RANK: NOVICE</span>
             </div>
-            <div class="level-bar"><div class="level-progress" style="width: 45%;"></div></div>
-            <p style="font-size: 12px; color: #888; margin-top: 10px;">XP: 450 / 1000</p>
+            <div class="level-bar"><div class="level-progress" id="progress-bar" style="width: 0%;"></div></div>
+            <p id="xp-display" style="font-size: 12px; color: #888; margin-top: 10px;">XP: 0 / 1000</p>
         </div>
     </div>
 
+    <!-- WORKOUT PAGE (AI KAMERA BILAN) -->
     <div id="workout" class="page">
         <h2 style="color: var(--neon-purple);">SQUAT MODE</h2>
-        <div id="count" style="font-size: 100px; font-weight: bold; margin: 40px 0; text-shadow: 0 0 20px var(--neon-blue);">0</div>
-        <div class="glass-card" id="status" style="text-align: center; color: #888;">TAYYORMISIZ?</div>
-        <button class="neon-btn" id="start-btn" onclick="startGame()">START MISSION</button>
+        
+        <!-- Kamera ko'rinishi (kichikroq va chiroyli) -->
+        <div class="camera-container" style="position: relative; width: 100%; max-width: 300px; margin: 0 auto; border-radius: 20px; overflow: hidden; border: 2px solid var(--neon-blue);">
+            <video id="input_video" style="display:none;"></video>
+            <canvas id="output_canvas" style="width: 100%; height: auto; transform: scaleX(-1);"></canvas>
+            <div id="angle-text" style="position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; font-size: 12px;">Angle: 0°</div>
+        </div>
+
+        <div id="count" style="font-size: 80px; font-weight: bold; margin: 20px 0; text-shadow: 0 0 20px var(--neon-blue);">0</div>
+        <div class="glass-card" id="status" style="text-align: center; color: #888;">AI QIDIRILMOQDA...</div>
+        
+        <button class="neon-btn" id="start-btn" onclick="startGame()">START AI MISSION</button>
         <button class="neon-btn" id="finish-btn" style="display:none; border-color: var(--neon-purple); color: var(--neon-purple);" onclick="endGame()">FINISH & SAVE</button>
     </div>
 
+    <!-- LEADERBOARD PAGE -->
     <div id="leaderboard" class="page">
         <h2 style="color: var(--neon-blue);">TOP PLAYERS</h2>
-        <div class="glass-card" style="width: 100%;">
-            <div style="display:flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #333;">
-                <span>1. JOXADEVELOP</span> <span>2500 XP</span>
-            </div>
+        <div class="glass-card" id="leaderboard-list" style="width: 100%;">
+            <!-- Ma'lumotlar JS orqali keladi -->
+            <p style="text-align: center; color: #555;">Yuklanmoqda...</p>
         </div>
     </div>
 
+    <!-- NAVIGATION -->
     <div class="bottom-nav">
-    <div class="nav-link active" onclick="showPage('profile', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>PROFILE</span>
-    </div>
-    <div class="nav-link" onclick="showPage('workout', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 7h12M6 17h12M6 7v10M18 7v10M2 12h4M18 12h4"></path>
-        </svg>
-        <span>TRAIN</span>
-    </div>
-    <div class="nav-link" onclick="showPage('leaderboard', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-            <path d="M4 22h16"></path>
-            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-        </svg>
-        <span>RANK</span>
-    </div>
+        <div class="nav-link active" onclick="showPage('profile', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>PROFILE</span>
+        </div>
+        <div class="nav-link" onclick="showPage('workout', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12M6 17h12M6 7v10M18 7v10M2 12h4M18 12h4"></path></svg>
+            <span>TRAIN</span>
+        </div>
+        <div class="nav-link" onclick="showPage('leaderboard', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <span>RANK</span>
+        </div>
     </div>
 
+    <!-- MediaPipe Kutubxonalari -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    
+    <!-- O'zingizning JS faylingiz -->
     <script src="script.js"></script>
 </body>
 </html>
