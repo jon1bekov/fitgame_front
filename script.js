@@ -42,7 +42,7 @@ function handleSquat(event) {
     if (!isActive) return;
     let beta = event.beta;
 
-    if (beta > 80) {
+    if (beta > 70) {
         if (stage === "up") {
             stage = "down";
             document.getElementById('status').innerText = "GO DOWN... ✅";
