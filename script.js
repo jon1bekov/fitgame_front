@@ -40,30 +40,27 @@ function stopMotion() {
 
 function handleSquat(event) {
     if (!isActive) return;
-    let beta = event.beta;
+    
+    // Beta - telefonning oldi-orqaga egilishi (-180 dan 180 gacha)
+    let beta = Math.round(event.beta); 
 
-    if (beta > 70) {
+    // Tekshirish uchun statusga yozib turamiz (Buni keyin o'chirib tashlaysiz)
+    document.getElementById('status').innerText = "Beta: " + beta;
+
+    // Graduslarni kengaytiramiz: 
+    // O'tirganda (pastda) telefon odatda vertikalroq bo'ladi (qiymat osha boshlaydi)
+    if (beta > 65) { 
         if (stage === "up") {
             stage = "down";
-            document.getElementById('status').innerText = "GO DOWN... ✅";
-            document.getElementById('status').style.color = "#00f2ff";
+            tg.HapticFeedback.impactOccurred('light'); // Pastga tushganini bildirish
         }
     }
     
-    if (beta < 40 && stage === "down") {
+    // Turganingizda (tepada) telefon gorizontalroq bo'ladi (qiymat kamayadi)
+    if (beta < 35 && stage === "down") {
         squatCount++;
         stage = "up";
         document.getElementById('count').innerText = squatCount;
-        document.getElementById('status').innerText = "KEEP GOING! 🔥";
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-}
-
-function endGame() {
-    if (squatCount > 0) {
-        tg.sendData(JSON.stringify({ reps: squatCount, type: 'squat' }));
-        tg.close();
-    } else {
-        alert("Siz hali mashq qilmadingiz!");
+        tg.HapticFeedback.notificationOccurred('success'); // Hisoblaganini bildirish
     }
 }
