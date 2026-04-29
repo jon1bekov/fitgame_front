@@ -165,7 +165,6 @@ function endGame() {
     if (count > 0) {
         tg.sendData(JSON.stringify({ 
             reps: count, 
-            xp: count * 20, // AI rejimida qiyinroq bo'lgani uchun ko'proq XP
             type: 'squat_ai_verified' 
         }));
         tg.close();
