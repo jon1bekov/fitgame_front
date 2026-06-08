@@ -33,6 +33,9 @@ function calculateAngle(a, b, c) {
 function onResults(results) {
     if (!isActive) return;
 
+    canvasElement.width = results.image.width;
+    canvasElement.height = results.image.height;
+
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
@@ -135,7 +138,7 @@ const camera = new Camera(videoElement, {
             await pose.send({image: videoElement});
         }
     },
-    width: 480,
+    width: 640,
     height: 480
 });
 
