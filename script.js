@@ -1,5 +1,21 @@
-// --- 1. TELEGRAM WEBAPP VA DOM ELEMENTLARINI SOZLACH ---
-const tg = window.Telegram.WebApp;
+// --- 1. TELEGRAM WEBAPP OBYEKTINI XAVFSIZ YUKLASH ---
+let tg = null;
+
+// Telegram WebApp to'liq yuklanganini kutish funksiyasi
+function initializeTelegram() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        tg = window.Telegram.WebApp;
+        tg.ready(); // Telegramga ilova tayyorligini bildirish
+        tg.expand(); // Ilovani to'liq ekranga ochish
+        console.log("Telegram WebApp muvaffaqiyatli yuklandi!");
+    } else {
+        console.error("Telegram WebApp skripti topilmadi!");
+    }
+}
+
+// Sahifa yuklanishi bilan Telegramni ishga tushiramiz
+window.addEventListener('DOMContentLoaded', initializeTelegram);
+
 const videoElement = document.getElementById('input_video');
 const canvasElement = document.getElementById('output_canvas');
 const canvasCtx = canvasElement.getContext('2d');
