@@ -1,20 +1,40 @@
-// --- 1. TELEGRAM WEBAPP OBYEKTINI XAVFSIZ YUKLASH ---
-let tg = null;
+// Telegram WebApp obyektini xavfsiz va global aniqlash
+const tg = window.Telegram?.WebApp;
 
-// Telegram WebApp to'liq yuklanganini kutish funksiyasi
-function initializeTelegram() {
-    if (window.Telegram && window.Telegram.WebApp) {
-        tg = window.Telegram.WebApp;
-        tg.ready(); // Telegramga ilova tayyorligini bildirish
-        tg.expand(); // Ilovani to'liq ekranga ochish
-        console.log("Telegram WebApp muvaffaqiyatli yuklandi!");
-    } else {
-        console.error("Telegram WebApp skripti topilmadi!");
+function getTelegramUserId() {
+    // 1-Yo'l: Standart to'g'ridan-to'g'ri foydalanuvchi obyekti
+    if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id;
     }
-}
+    
+    // 2-Yo'l: Agar obyekti bo'sh bo'lsa, xavfsiz matnli initData ichidan qidirish (Reply Button uchun eng yaxshi yechim)
+    if (tg?.initData) {
+        try {
+            const urlParams = new URLSearchParams(tg.initData);
+            const userRaw = urlParams.get('user');
+            if (userRaw) {
+                const userObj = JSON.parse(userRaw);
+                if (userObj && userObj.id) {
+                    return userObj.id;
+                }
+            }
+        } catch (e) {
+            console.error("Telegram initData parslashda xato:", e);
+        }
+    }
+    
+    // 3-Yo'l: Brauzerning URL manzili tarkibidan qidirish
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        // Telegram ba'zan parametrlarni to'g'ridan-to'g'ri URL'ga ham qo'shib yuboradi
+        const tgWebAppStartParam = urlParams.get('tgWebAppStartParam');
+        if (tgWebAppStartParam) return tgWebAppStartParam;
+    } catch (e) {
+        console.error("URL parslashda xato:", e);
+    }
 
-// Sahifa yuklanishi bilan Telegramni ishga tushiramiz
-window.addEventListener('DOMContentLoaded', initializeTelegram);
+    return null;
+}
 
 const videoElement = document.getElementById('input_video');
 const canvasElement = document.getElementById('output_canvas');
