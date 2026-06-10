@@ -28,7 +28,7 @@ let isActive = false;
 let lastSquatTime = 0;
 
 // API Sozlamalari (Production'da buni o'zingizning server domeningizga o'zgartiring)
-const API_BASE_URL = 'http://localhost:5000'; 
+const API_BASE_URL = ' https://impound-encrypt-lullaby.ngrok-free.dev'; 
 const XP_PER_REPETITION = 50; // Har bir to'g'ri squat uchun beriladigan XP balli
 
 // Sozlamalar (Anti-Hack)
