@@ -7,32 +7,18 @@ function getTelegramUserId() {
         return tg.initDataUnsafe.user.id;
     }
     
-    // 2-Yo'l: Agar obyekti bo'sh bo'lsa, xavfsiz matnli initData ichidan qidirish (Reply Button uchun eng yaxshi yechim)
-    if (tg?.initData) {
-        try {
-            const urlParams = new URLSearchParams(tg.initData);
-            const userRaw = urlParams.get('user');
-            if (userRaw) {
-                const userObj = JSON.parse(userRaw);
-                if (userObj && userObj.id) {
-                    return userObj.id;
-                }
-            }
-        } catch (e) {
-            console.error("Telegram initData parslashda xato:", e);
-        }
-    }
-    
-    // 3-Yo'l: Brauzerning URL manzili tarkibidan qidirish
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        // Telegram ba'zan parametrlarni to'g'ridan-to'g'ri URL'ga ham qo'shib yuboradi
-        const tgWebAppStartParam = urlParams.get('tgWebAppStartParam');
-        if (tgWebAppStartParam) return tgWebAppStartParam;
-    } catch (e) {
-        console.error("URL parslashda xato:", e);
-    }
+}
 
+
+function getTelegramUserId() {
+    // Brauzer linkidan (?user_id=6000697269) qismini qidiradi
+    const urlParams = new URLSearchParams(window.location.search);
+    const tgId = urlParams.get('user_id');
+    
+    if (tgId) {
+        console.log("ID linkdan muvaffaqiyatli olindi:", tgId);
+        return tgId;
+    }
     return null;
 }
 
