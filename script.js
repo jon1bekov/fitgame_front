@@ -238,7 +238,12 @@ function endGame() {
             })
         })
         .then(response => {
-            if (!response.ok) throw new Error("API xatoligi");
+            if (!response.ok) {
+                // Diagnostika uchun: aniq status kodi va server javobini ko'rsatamiz
+                return response.text().then(bodyText => {
+                    throw new Error(`API xatoligi. Status: ${response.status}. Javob: ${bodyText}`);
+                });
+            }
             return response.json();
         })
         .then(res => {
@@ -263,7 +268,8 @@ function endGame() {
         })
         .catch(err => {
             console.error("Server bilan aloqa uzildi:", err);
-            alert("Aloqa xatosi: Natijangiz bazada saqlana olmadi.");
+            // DIAGNOSTIKA: haqiqiy xatolik matnini ko'rsatamiz, taxmin qilmaymiz
+            alert("DIAGNOSTIKA:\nID: " + tgId + "\nXato: " + err.message);
             location.reload();
         });
 
