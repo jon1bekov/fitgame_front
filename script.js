@@ -163,6 +163,79 @@ const camera = new Camera(videoElement, {
     height: 480
 });
 
+// --- PROFIL MA'LUMOTLARINI YUKLASH ---
+function updateProfileUI(xp, level) {
+    const XP_PER_LEVEL = 500;
+    const currentLevelBaseXp = (level - 1) * XP_PER_LEVEL;
+    const xpInCurrentLevel = xp - currentLevelBaseXp;
+    const progressPercent = Math.min(100, Math.round((xpInCurrentLevel / XP_PER_LEVEL) * 100));
+
+    let rank = "NOVICE";
+    if (level >= 10) rank = "LEGEND";
+    else if (level >= 6) rank = "WARRIOR";
+    else if (level >= 3) rank = "FIGHTER";
+
+    document.getElementById('lvl-display').innerText = `LVL: ${String(level).padStart(2, '0')}`;
+    document.getElementById('rank-display').innerText = `RANK: ${rank}`;
+    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+    document.getElementById('xp-display').innerText = `XP: ${xpInCurrentLevel} / ${XP_PER_LEVEL}`;
+}
+
+async function loadProfile() {
+    const tgId = getTelegramUserId();
+    if (!tgId) return; // Test rejimida (Telegram tashqarisida) jim o'tkazib yuboramiz
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/user/${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        if (!response.ok) return; // Foydalanuvchi hali bazada yo'q bo'lishi mumkin (masalan /start bosilmagan)
+
+        const res = await response.json();
+        if (res.status === "success") {
+            updateProfileUI(res.data.xp, res.data.level);
+        }
+    } catch (err) {
+        console.error("Profilni yuklashda xatolik:", err);
+    }
+}
+
+// --- REYTING (LEADERBOARD) MA'LUMOTLARINI YUKLASH ---
+async function loadLeaderboard() {
+    const listEl = document.getElementById('leaderboard-list');
+    listEl.innerHTML = '<p style="text-align: center; color: #555;">Yuklanmoqda...</p>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leaderboard`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        if (!response.ok) throw new Error("Reytingni yuklab bo'lmadi");
+
+        const res = await response.json();
+        if (res.status !== "success" || !res.data.length) {
+            listEl.innerHTML = '<p style="text-align: center; color: #555;">Hali natijalar yo\'q</p>';
+            return;
+        }
+
+        const currentTgId = String(getTelegramUserId());
+        listEl.innerHTML = res.data.map((player, index) => {
+            const isMe = String(player.telegram_id) === currentTgId;
+            const nameColor = isMe ? 'var(--neon-blue)' : '#e0e0e0';
+            return `
+                <div>
+                    <span style="color:${nameColor}; font-weight:${isMe ? 'bold' : 'normal'};">
+                        ${index + 1}. ${player.full_name || 'Foydalanuvchi'}
+                    </span>
+                    <span style="color: var(--neon-purple);">${player.xp} XP · LVL ${player.level}</span>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Reytingni yuklashda xatolik:", err);
+        listEl.innerHTML = '<p style="text-align: center; color: red;">Yuklashda xatolik yuz berdi</p>';
+    }
+}
+
 // --- 6. MINI APP SAHIFALARINI BOSHQARISH ---
 function showPage(pageId, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -176,6 +249,10 @@ function showPage(pageId, el) {
             videoElement.srcObject.getTracks().forEach(track => track.stop());
         }
     }
+
+    // Sahifaga kirganda ma'lumotni yangilab turamiz
+    if (pageId === 'profile') loadProfile();
+    if (pageId === 'leaderboard') loadLeaderboard();
 }
 
 // --- 7. O'YINNI BOSHLASH (START GAME) ---
@@ -250,6 +327,9 @@ function endGame() {
             if (res.status === "success") {
                 tg?.HapticFeedback?.notificationOccurred('success');
 
+                // Profilni darhol yangi ma'lumot bilan yangilaymiz (qayta so'rovsiz)
+                updateProfileUI(res.data.total_xp, res.data.level);
+
                 // Muvaffaqiyatli yakuniy xabar
                 alert(
                     `Daxshat natija! 🏆\n\n` +
@@ -281,3 +361,6 @@ function endGame() {
 
 // Telegram WebApp yuklanganini bildirish
 tg?.ready();
+
+// Mini App ochilganda profil ma'lumotini darhol yuklaymiz
+loadProfile();
