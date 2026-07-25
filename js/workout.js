@@ -60,13 +60,21 @@ export async function endWorkout() {
         alert(
             `Daxshat natija! 🏆\n\n` +
                 `Mashq turi: Squat (O'tirish)\n` +
-                `Miqdori: ${count} ta\n` +
+                `Mashq miqdori: ${count} ta\n` +
                 `Siz yutdingiz: +${totalXpEarned} XP\n\n` +
                 `Jami yangi balingiz: ${data.total_xp} XP\n` +
                 `Hozirgi Darajangiz (Level): ${data.level}`
         );
 
-        tg?.close();
+        // Mini app ni YOPMAYMIZ, bosh sahifaga qaytib profilni yangilaymiz
+        const profileNav = document.querySelector('.nav-link');
+        window.showPage('profile', profileNav);
+
+        // Workout sahifasini keyingi mashq uchun boshlang'ich holatga qaytamiz
+        startBtn.style.display = 'block';
+        finishBtn.style.display = 'none';
+        statusElement.innerText = 'AI QIDIRILMOQDA...';
+        statusElement.style.color = '#888';
     } catch (err) {
         console.error('Server bilan aloqa uzildi:', err);
         alert('Aloqa xatosi: Natijangiz bazada saqlana olmadi.\n' + err.message);

@@ -4,7 +4,7 @@
 
 import { fetchUserProfile } from './api.js';
 import { getTelegramUserId } from './telegram.js';
-import { XP_PER_LEVEL } from './config.js';
+import { calculateLevel, getLevelProgress } from './config.js';
 
 /**
  * Profil interfeysini berilgan XP/level qiymatlari bilan yangilaydi.
@@ -12,9 +12,7 @@ import { XP_PER_LEVEL } from './config.js';
  * tugagandan keyin workout.js dan) — shuning uchun alohida export qilingan.
  */
 export function updateProfileUI(xp, level) {
-    const currentLevelBaseXp = (level - 1) * XP_PER_LEVEL;
-    const xpInCurrentLevel = xp - currentLevelBaseXp;
-    const progressPercent = Math.min(100, Math.round((xpInCurrentLevel / XP_PER_LEVEL) * 100));
+    const { currentInLevel, neededForLevel, progressPercent } = getLevelProgress(xp, level);
 
     let rank = 'NOVICE';
     if (level >= 10) rank = 'LEGEND';
@@ -24,7 +22,7 @@ export function updateProfileUI(xp, level) {
     document.getElementById('lvl-display').innerText = `LVL: ${String(level).padStart(2, '0')}`;
     document.getElementById('rank-display').innerText = `RANK: ${rank}`;
     document.getElementById('progress-bar').style.width = `${progressPercent}%`;
-    document.getElementById('xp-display').innerText = `XP: ${xpInCurrentLevel} / ${XP_PER_LEVEL}`;
+    document.getElementById('xp-display').innerText = `XP: ${currentInLevel} / ${neededForLevel}`;
 }
 
 /** Profil ma'lumotini backend'dan yuklab, ekranga chiqaradi. */
@@ -34,6 +32,8 @@ export async function loadProfile() {
 
     const data = await fetchUserProfile(tgId);
     if (data) {
-        updateProfileUI(data.xp, data.level);
+        // XP dan levelni qayta hisoblaymiz — bu DB'dagi eski level bilan mos kelmasligini oldini oladi
+        const level = calculateLevel(data.xp);
+        updateProfileUI(data.xp, level);
     }
 }
