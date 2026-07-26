@@ -67,7 +67,11 @@ export async function endWorkout() {
         );
 
         // Mini app ni YOPMAYMIZ, bosh sahifaga qaytib profilni yangilaymiz
-        const profileNav = document.querySelector('.nav-link');
+        // MUHIM TUZATISH: avvalgi versiyada document.querySelector('.nav-link')
+        // ishlatilgan edi — bu HTML'dagi BIRINCHI nav-link elementini tanlaydi,
+        // hozircha tasodifan Profil bo'lgani uchun ishlaydi, lekin navigatsiya
+        // tartibi o'zgarsa jimgina buziladi. ID orqali ishonchli tanlaymiz.
+        const profileNav = document.getElementById('nav-profile');
         window.showPage('profile', profileNav);
 
         // Workout sahifasini keyingi mashq uchun boshlang'ich holatga qaytamiz
