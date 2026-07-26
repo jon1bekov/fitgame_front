@@ -13,8 +13,13 @@ const statusElement = document.getElementById('status');
 const startBtn = document.getElementById('start-btn');
 const finishBtn = document.getElementById('finish-btn');
 
+let isSubmitting = false; // Qayta-qayta yuborishning (double-submit) oldini olish uchun
+
 /** "BOSHLASH" tugmasi bosilganda chaqiriladi */
 export function startWorkout() {
+    isSubmitting = false;
+    finishBtn.disabled = false;
+
     tg?.expand();
     startBtn.style.display = 'none';
     finishBtn.style.display = 'block';
@@ -28,6 +33,14 @@ export function startWorkout() {
 
 /** "TUGATISH & SAQLASH" tugmasi bosilganda chaqiriladi */
 export async function endWorkout() {
+    // MUHIM TUZATISH: avvalgi versiyada tugma natija saqlanayotgan vaqtda ham
+    // bosilishi mumkin edi — har bosishda bir xil natija QAYTA yuborilib,
+    // XP bir necha marta qo'shilib ketardi. Endi funksiya ishlab turgan
+    // paytda qayta chaqirilishning oldi olinadi.
+    if (isSubmitting) return;
+    isSubmitting = true;
+    finishBtn.disabled = true;
+
     stopTracking();
     const count = getRepCount();
 
