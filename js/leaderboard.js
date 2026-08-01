@@ -23,13 +23,13 @@ export async function loadLeaderboard() {
         listEl.innerHTML = players
             .map((player, index) => {
                 const isMe = String(player.telegram_id) === currentTgId;
-                const nameColor = isMe ? 'var(--neon-blue)' : '#e0e0e0';
+                const nameColor = isMe ? 'var(--game-orange)' : '#e0e0e0';
                 return `
                     <div>
                         <span style="color:${nameColor}; font-weight:${isMe ? 'bold' : 'normal'};">
                             ${index + 1}. ${player.full_name || 'Foydalanuvchi'}
                         </span>
-                        <span style="color: var(--neon-purple);">${player.xp} XP · LVL ${player.level}</span>
+                        <span style="color: var(--game-green); font-weight: 800;">${player.xp} XP · LVL ${player.level}</span>
                     </div>
                 `;
             })

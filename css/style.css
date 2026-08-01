@@ -1,134 +1,532 @@
-/* 1. ASOSIY O'ZGARUVCHILAR */
+/* 1. ASOSIY O'ZGARUVCHILAR — O'YIN USLUBIDAGI ORANJIV-YASHIL TEMA */
+@property --hero-scale {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1;
+}
+
 :root {
     --neon-blue: #00f2ff;
     --neon-purple: #bc13fe;
-    --bg-dark: #0a0a0c;
-    --card-bg: rgba(22, 22, 26, 0.8);
-    --text-main: #e0e0e0;
-    --neon-glow: 0 0 15px rgba(0, 242, 255, 0.5);
+
+    /* Yangi o‘yin ranglari */
+    --game-orange: #ff7b00;
+    --game-orange-light: #ffa64d;
+    --game-green: #00e676;
+    --game-green-dark: #00a152;
+    --game-gold: #ffd700;
+    --game-red: #ff3d00;
+
+    --bg-dark: #0d0f0d;
+    --bg-gradient-start: #0d0f0d;
+    --bg-gradient-end: #1a1c18;
+    --card-bg: rgba(28, 32, 26, 0.75);
+    --card-border: rgba(255, 123, 0, 0.25);
+    --text-main: #f0f0f0;
+    --text-muted: #9e9e9e;
+
+    --neon-glow: 0 0 20px rgba(255, 123, 0, 0.5);
+    --green-glow: 0 0 20px rgba(0, 230, 118, 0.5);
+    --orange-gradient: linear-gradient(135deg, var(--game-orange), var(--game-orange-light));
+    --green-gradient: linear-gradient(135deg, var(--game-green), var(--game-green-dark));
+    --main-gradient: linear-gradient(135deg, var(--game-orange), var(--game-green));
+    --heat-gradient: linear-gradient(90deg, var(--game-green), var(--game-orange), var(--game-red));
 }
 
 /* 2. UMUMIY STILLAR */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-dark);
+    background: radial-gradient(ellipse at top, var(--bg-gradient-end) 0%, var(--bg-gradient-start) 60%);
     color: var(--text-main);
     margin: 0;
     padding: 0;
     height: 100vh;
-    overflow: hidden; /* Skrollni cheklash (navigatsiya uchun) */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 40%, rgba(255, 123, 0, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(0, 230, 118, 0.06) 0%, transparent 40%),
+        linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: -2;
+}
+
 .bg-glow {
     position: fixed;
-    top: -100px;
-    left: -100px;
-    width: 300px;
-    height: 300px;
-    background: var(--neon-blue);
-    filter: blur(150px);
-    opacity: 0.15;
+    top: -120px;
+    left: -120px;
+    width: 360px;
+    height: 360px;
+    background: var(--game-orange);
+    filter: blur(160px);
+    opacity: 0.22;
     z-index: -1;
+    animation: ambientMove 10s ease-in-out infinite alternate;
+}
+
+.bg-glow::after {
+    content: '';
+    position: fixed;
+    bottom: -100px;
+    right: -100px;
+    width: 320px;
+    height: 320px;
+    background: var(--game-green);
+    filter: blur(150px);
+    opacity: 0.18;
+    border-radius: 50%;
+    animation: ambientMoveReverse 12s ease-in-out infinite alternate;
+}
+
+@keyframes ambientMove {
+    from { transform: translate(0, 0); }
+    to { transform: translate(30px, 30px); }
+}
+
+@keyframes ambientMoveReverse {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-30px, -20px); }
 }
 
 /* 3. SAHIFA BOSHQARUVI */
 .page {
     display: none;
     flex: 1;
-    padding: 20px;
+    padding: 24px 20px;
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
-    padding-bottom: 100px; /* Navigatsiya uchun joy */
+    padding-bottom: 110px;
 }
 
 .page.active {
     display: flex;
-    animation: fadeIn 0.4s ease-out;
+    animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* 4. PROFIL VA PERSONAJ */
+.page h2 {
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin: 0 0 14px 0;
+    text-transform: uppercase;
+    background: var(--main-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(255, 123, 0, 0.3));
+}
+
+/* 4. PROFIL VA 3D PERSONAJ */
 .character-container {
     position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 20px 0;
-    background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%);
+    width: 260px;
+    height: 300px;
+    margin: 6px 0 16px;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 }
 
-.char-svg {
-    width: 130px;
-    height: 130px;
-    filter: drop-shadow(0 0 15px var(--neon-blue));
-    animation: float 3s ease-in-out infinite;
+.character-stage {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 18px;
+    background: radial-gradient(ellipse, rgba(255, 123, 0, 0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: stagePulse 3s ease-in-out infinite;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(2deg); }
+@keyframes stagePulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.1); opacity: 0.9; }
 }
 
-/* 5. GLASSMORPHI CARD (SHISHA EFFEKTI) */
-.glass-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
+/* 4B. HERO PERSONAJ — SVG asosidagi energetik jangchi.
+   Level oshgani sari: yangi rang -> zirh -> qurol -> plash/qanot/toj qo'shiladi. */
+
+.hero {
+    position: relative;
+    width: 168px;
+    height: 220px;
+    --tier-color: #8a94a3;
+    color: var(--tier-color);
+    animation: heroFloat 3.4s ease-in-out infinite;
+    transition: filter 0.6s ease;
+    z-index: 2;
+}
+
+@keyframes heroFloat {
+    0%, 100% { transform: translateY(0) rotateZ(0deg); }
+    50% { transform: translateY(-10px) rotateZ(1deg); }
+}
+
+.hero__svg {
+    position: relative;
     width: 100%;
-    max-width: 350px;
-    padding: 20px;
+    height: 100%;
+    overflow: visible;
+    display: block;
+}
+
+/* --- Tananing asosiy qismlari (barcha darajalarda mavjud) --- */
+.hero-torso { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.4)); }
+.hero-head { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)); }
+.hero-arm, .hero-leg { filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3)); }
+
+.hero-visor {
+    fill: currentColor;
+    filter: drop-shadow(0 0 6px currentColor);
+    transition: fill 0.6s ease, filter 0.6s ease;
+}
+
+.hero-fist {
+    fill: #1c2128;
+    stroke: currentColor;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 5px currentColor);
+    transition: stroke 0.6s ease, filter 0.6s ease;
+}
+
+/* Ko'krakdagi energiya yadrosi — XP/kuchning vizual ramzi, doim urib turadi */
+.hero-core {
+    fill: currentColor;
+    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+    animation: corePulse 1.8s ease-in-out infinite;
+    transition: fill 0.6s ease;
+}
+
+@keyframes corePulse {
+    0%, 100% { opacity: 0.75; r: 11px; }
+    50% { opacity: 1; r: 14px; }
+}
+
+/* --- Zirh, qurol, plash, qanot, toj: standart holatda yashiringan --- */
+.hero-armor,
+.hero-chestplate,
+.hero-weapon,
+.hero-cape,
+.hero-wing,
+.hero-crown {
+    fill: currentColor;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.85);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-weapon {
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* ============================================
+   TIER 1 — NOVICE (Level 1-2): xira, kamquvvat energiya
+   ============================================ */
+.hero[data-tier="novice"] {
+    --tier-color: #8a94a3;
+    filter: saturate(0.65) brightness(0.9);
+}
+
+/* ============================================
+   TIER 2 — FIGHTER (Level 3-5): yashil energiya, elka zirhi paydo bo'ladi
+   ============================================ */
+.hero[data-tier="fighter"] {
+    --tier-color: #00e676;
+}
+.hero[data-tier="fighter"] .hero-armor {
+    opacity: 1;
+    transform: scale(0.92);
+}
+
+/* ============================================
+   TIER 3 — WARRIOR (Level 6-9): to'liq zirh + energiya qilich
+   ============================================ */
+.hero[data-tier="warrior"] {
+    --tier-color: #ff7b00;
+}
+.hero[data-tier="warrior"] .hero-armor {
+    opacity: 1;
+    transform: scale(1.12);
+}
+.hero[data-tier="warrior"] .hero-chestplate,
+.hero[data-tier="warrior"] .hero-weapon {
+    opacity: 1;
+    transform: scale(1);
+}
+.hero[data-tier="warrior"] .hero-fist {
+    stroke-width: 4;
+}
+
+/* ============================================
+   TIER 4 — LEGEND (Level 10+): oltin zirh, plash, qanot, toj, aylanuvchi nurlar
+   ============================================ */
+.hero[data-tier="legend"] {
+    --tier-color: #ffd700;
+    filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.55));
+}
+.hero[data-tier="legend"] .hero-armor {
+    opacity: 1;
+    transform: scale(1.28);
+}
+.hero[data-tier="legend"] .hero-chestplate,
+.hero[data-tier="legend"] .hero-weapon,
+.hero[data-tier="legend"] .hero-crown {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.hero[data-tier="legend"] .hero-cape {
+    opacity: 0.92;
+    transform: scale(1);
+    animation: capeSway 3s ease-in-out infinite;
+}
+.hero[data-tier="legend"] .hero-wing {
+    opacity: 0.85;
+    transform: scale(1);
+    animation: wingFlutter 2.4s ease-in-out infinite;
+}
+.hero[data-tier="legend"] .hero-wing--right { animation-delay: 0.15s; }
+.hero[data-tier="legend"] .hero-weapon {
+    filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 22px currentColor);
+}
+
+@keyframes capeSway {
+    0%, 100% { transform: scale(1) skewX(0deg); }
+    50% { transform: scale(1) skewX(3deg); }
+}
+
+@keyframes wingFlutter {
+    0%, 100% { transform: scale(1) rotateY(0deg); }
+    50% { transform: scale(1.04) rotateY(10deg); }
+}
+
+/* --- "EVOLYUTSIYA" PORTLASHI — daraja oshganda bir martalik effekt (JS orqali qo'shiladi) --- */
+.hero.hero--evolving {
+    animation: heroFloat 3.4s ease-in-out infinite, evolveBurst 0.7s ease-out;
+}
+
+@keyframes evolveBurst {
+    0% { filter: brightness(1); }
+    35% { filter: brightness(1.9) saturate(1.5); }
+    100% { filter: brightness(1); }
+}
+
+/* --- Atmosfera: aura, aylanuvchi nurlar, uchqunlar --- */
+.hero__aura {
+    position: absolute;
+    top: 8%;
+    left: -25%;
+    right: -25%;
+    bottom: 8%;
+    background: radial-gradient(circle, var(--tier-color) 0%, transparent 70%);
+    opacity: 0.25;
+    filter: blur(30px);
+    border-radius: 50%;
+    animation: auraPulse 2.4s ease-in-out infinite;
+    z-index: -1;
+    transition: background 0.6s ease;
+}
+
+@keyframes auraPulse {
+    0%, 100% { transform: scale(1); opacity: 0.22; }
+    50% { transform: scale(1.15); opacity: 0.4; }
+}
+
+.hero__rays {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 320px;
+    height: 320px;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(from 0deg,
+        transparent 0deg, rgba(255, 215, 0, 0.18) 8deg, transparent 20deg,
+        transparent 90deg, rgba(255, 215, 0, 0.18) 98deg, transparent 110deg,
+        transparent 180deg, rgba(255, 215, 0, 0.18) 188deg, transparent 200deg,
+        transparent 270deg, rgba(255, 215, 0, 0.18) 278deg, transparent 290deg);
+    opacity: 0;
+    border-radius: 50%;
+    z-index: -2;
+    transition: opacity 0.6s ease;
+}
+
+.hero[data-tier="legend"] .hero__rays {
+    opacity: 1;
+    animation: raysSpin 12s linear infinite;
+}
+
+@keyframes raysSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.hero__spark {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--tier-color);
+    box-shadow: 0 0 8px 2px var(--tier-color);
+    opacity: 0;
+    z-index: 1;
+}
+
+.hero[data-tier="legend"] .hero__spark {
+    animation: sparkTwinkle 3s ease-in-out infinite;
+}
+
+.hero__spark--1 { top: 15%; left: 4%; animation-delay: 0s; }
+.hero__spark--2 { top: 35%; right: 0%; animation-delay: 0.7s; }
+.hero__spark--3 { bottom: 25%; left: -2%; animation-delay: 1.4s; }
+.hero__spark--4 { top: 5%; right: 16%; animation-delay: 2.1s; }
+
+@keyframes sparkTwinkle {
+    0%, 100% { opacity: 0; transform: translateY(0) scale(0.6); }
+    50% { opacity: 1; transform: translateY(-14px) scale(1.2); }
+}
+
+
+/* 5. GLASSMORPHIC CARD — O'YIN USLUBI */
+.glass-card {
+    position: relative;
+    background: var(--card-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 380px;
+    padding: 22px;
     margin: 10px 0;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-    box-sizing: border-box;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 0 30px rgba(255, 123, 0, 0.1);
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--heat-gradient);
+    opacity: 0.8;
 }
 
 .level-bar {
     width: 100%;
-    height: 10px;
-    background: #1a1a1f;
-    border-radius: 5px;
-    margin-top: 12px;
+    height: 14px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 7px;
+    margin-top: 14px;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .level-progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-    box-shadow: 0 0 15px var(--neon-blue);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--heat-gradient);
+    box-shadow: 0 0 16px rgba(0, 230, 118, 0.6);
+    border-radius: 7px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.level-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -50%; }
+    100% { left: 150%; }
+}
+
+#lvl-display {
+    font-weight: 900;
+    color: var(--game-orange);
+    letter-spacing: 1px;
+}
+
+#rank-display {
+    font-weight: 900;
+    color: var(--game-green);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+}
+
+#xp-display {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    text-align: center;
+    letter-spacing: 0.5px;
 }
 
 /* 6. AI KAMERA INTERFEYSI */
 .camera-container {
     position: relative;
     width: 100%;
-    max-width: 320px;
+    max-width: 340px;
     aspect-ratio: 1 / 1;
     margin: 15px auto;
-    border-radius: 24px;
-    background: #000;
-    border: 2px solid var(--neon-blue);
-    box-shadow: var(--neon-glow);
+    border-radius: 28px;
+    background: linear-gradient(145deg, #0a0a0a, #141414);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow:
+        0 0 0 2px rgba(255, 123, 0, 0.3),
+        0 0 30px rgba(255, 123, 0, 0.15),
+        inset 0 0 30px rgba(0, 0, 0, 0.8);
     overflow: hidden;
+}
+
+.camera-container::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    background: var(--main-gradient);
+    border-radius: 30px;
 }
 
 #output_canvas {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Tasvirni ramka bo'ylab to'liq yoyish uchun */
-    border-radius: 20px; /* Neon ramka burchaklariga moslashishi uchun */
+    object-fit: cover;
+    border-radius: 24px;
     display: block;
 }
 
@@ -136,49 +534,89 @@ body {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: rgba(0, 0, 0, 0.7);
-    color: var(--neon-blue);
-    padding: 6px 12px;
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    color: var(--game-green);
+    padding: 8px 14px;
+    border-radius: 14px;
     font-family: 'Courier New', monospace;
+    font-weight: 700;
     font-size: 14px;
-    border: 1px solid var(--neon-blue);
+    border: 1px solid var(--game-green);
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.2);
     z-index: 5;
 }
 
 /* 7. RAQAMLAR VA TUGMALAR */
 #count {
-    font-size: 90px;
-    font-weight: 800;
-    margin: 15px 0;
-    background: linear-gradient(to bottom, #fff, var(--neon-blue));
+    font-size: 100px;
+    font-weight: 900;
+    margin: 10px 0;
+    background: var(--main-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(0,242,255,0.3));
+    filter: drop-shadow(0 0 16px rgba(255, 123, 0, 0.4));
+    line-height: 1;
+}
+
+#status {
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
 .neon-btn {
     background: transparent;
-    border: 2px solid var(--neon-blue);
-    color: var(--neon-blue);
-    padding: 18px;
-    border-radius: 16px;
-    font-weight: bold;
+    border: 2px solid var(--game-green);
+    color: var(--game-green);
+    padding: 20px;
+    border-radius: 20px;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
     cursor: pointer;
     width: 100%;
-    max-width: 350px;
+    max-width: 380px;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     margin-top: 15px;
     outline: none;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 230, 118, 0.05);
+}
+
+.neon-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.neon-btn:hover::before,
+.neon-btn:active::before {
+    left: 100%;
 }
 
 .neon-btn:active {
-    transform: scale(0.95);
-    background: var(--neon-blue);
+    transform: scale(0.96);
+    background: var(--game-green);
     color: #000;
-    box-shadow: 0 0 30px var(--neon-blue);
+    box-shadow: 0 0 35px var(--game-green);
+}
+
+#finish-btn {
+    border-color: var(--game-orange);
+    color: var(--game-orange);
+    background: rgba(255, 123, 0, 0.05);
+}
+
+#finish-btn:active {
+    background: var(--game-orange);
+    color: #fff;
+    box-shadow: 0 0 35px var(--game-orange);
 }
 
 /* 8. NAVIGATSIYA MENYUSI */
@@ -186,13 +624,14 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 80px;
-    background: rgba(10, 10, 12, 0.95);
-    backdrop-filter: blur(10px);
+    height: 86px;
+    background: rgba(13, 15, 13, 0.92);
+    backdrop-filter: blur(16px);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 123, 0, 0.2);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
     z-index: 100;
 }
 
@@ -203,38 +642,73 @@ body {
     color: #555;
     transition: 0.3s;
     flex: 1;
+    padding: 8px 0;
+    position: relative;
 }
 
 .nav-link svg {
-    width: 26px;
-    height: 26px;
-    margin-bottom: 4px;
+    width: 28px;
+    height: 28px;
+    margin-bottom: 6px;
     transition: 0.3s;
 }
 
 .nav-link span {
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.5px;
 }
 
 .nav-link.active {
-    color: var(--neon-blue);
+    color: var(--game-orange);
 }
 
 .nav-link.active svg {
-    filter: drop-shadow(0 0 8px var(--neon-blue));
-    transform: translateY(-3px);
+    filter: drop-shadow(0 0 10px var(--game-orange));
+    transform: translateY(-5px);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    width: 24px;
+    height: 3px;
+    background: var(--game-green);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--game-green);
 }
 
 /* 9. LEADERBOARD LIST */
 #leaderboard-list div {
     display: flex;
     justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 #leaderboard-list div:last-child {
     border-bottom: none;
+}
+
+#leaderboard-list span:first-child {
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+#leaderboard-list span:last-child {
+    font-weight: 800;
+    color: var(--game-orange);
+    font-size: 13px;
+}
+
+/* TOP 3 medalchilar uchun */
+.medal-gold { color: var(--game-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+.medal-silver { color: #c0c0c0; }
+.medal-bronze { color: #cd7f32; }
+
+/* Scrollbar stillarni yashirish */
+.page::-webkit-scrollbar {
+    width: 0;
 }
