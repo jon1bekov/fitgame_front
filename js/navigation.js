@@ -5,6 +5,7 @@
 import { stopTracking } from './pose-tracker.js';
 import { loadProfile } from './profile.js';
 import { loadLeaderboard } from './leaderboard.js';
+import { loadShop } from './shop.js';
 
 /** Pastki navigatsiya menyusidan chaqiriladi (HTML'dagi onclick orqali). */
 export function showPage(pageId, el) {
@@ -22,4 +23,5 @@ export function showPage(pageId, el) {
     // Sahifaga kirganda ma'lumotni har doim yangilab turamiz
     if (pageId === 'profile') loadProfile();
     if (pageId === 'leaderboard') loadLeaderboard();
+    if (pageId === 'shop') loadShop();
 }

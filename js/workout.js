@@ -65,18 +65,19 @@ export async function endWorkout() {
     const totalXpEarned = count * XP_PER_REPETITION;
 
     try {
-        const data = await submitWorkoutResult(tgId, totalXpEarned);
+        const data = await submitWorkoutResult(tgId, totalXpEarned, count);
 
         hapticNotify('success');
-        updateProfileUI(data.total_xp, data.level); // Profilni qayta so'rovsiz darhol yangilaymiz
+        updateProfileUI(data.total_xp, data.level, data.coins); // Profilni qayta so'rovsiz darhol yangilaymiz
 
         alert(
             `Daxshat natija! 🏆\n\n` +
                 `Mashq turi: Squat (O'tirish)\n` +
                 `Mashq miqdori: ${count} ta\n` +
-                `Siz yutdingiz: +${totalXpEarned} XP\n\n` +
+                `Siz yutdingiz: +${totalXpEarned} XP va +${count} 🪙 tanga\n\n` +
                 `Jami yangi balingiz: ${data.total_xp} XP\n` +
-                `Hozirgi Darajangiz (Level): ${data.level}`
+                `Hozirgi Darajangiz (Level): ${data.level}\n` +
+                `Tangalar: ${data.coins} 🪙`
         );
 
         // Mini app ni YOPMAYMIZ, bosh sahifaga qaytib profilni yangilaymiz

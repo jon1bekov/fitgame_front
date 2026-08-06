@@ -171,6 +171,10 @@ body::before {
     width: 168px;
     height: 220px;
     --tier-color: #8a94a3;
+    /* Do'kondan hech narsa sotib olinmagan/kiyilmagan bo'lsa, standart gradient ko'rinishda qoladi */
+    --shirt-color: url(#suitGrad);
+    --shorts-color: url(#suitGrad);
+    --shoes-color: url(#suitGrad);
     color: var(--tier-color);
     animation: heroFloat 3.4s ease-in-out infinite;
     transition: filter 0.6s ease;
@@ -191,43 +195,29 @@ body::before {
 }
 
 /* --- Tananing asosiy qismlari (barcha darajalarda mavjud) --- */
-.hero-torso { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.4)); }
-.hero-head { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)); }
-.hero-arm, .hero-leg { filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3)); }
+.hero-torso { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25)); }
+.hero-head { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2)); }
+.hero-arm, .hero-leg { filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.15)); }
+.hero-hair-back, .hero-hair-front { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25)); }
 
-.hero-visor {
-    fill: currentColor;
-    filter: drop-shadow(0 0 6px currentColor);
-    transition: fill 0.6s ease, filter 0.6s ease;
+/* Yalang oyoq — standart (NOVICE) holatda ko'rinadi */
+.hero-foot {
+    opacity: 1;
+    transition: opacity 0.4s ease;
 }
 
-.hero-fist {
-    fill: #1c2128;
-    stroke: currentColor;
-    stroke-width: 3;
-    filter: drop-shadow(0 0 5px currentColor);
-    transition: stroke 0.6s ease, filter 0.6s ease;
+/* Krossovka — standart holatda yashiringan, FIGHTER dan boshlab yalang oyoqni yopadi */
+.hero-shoe {
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
-/* Ko'krakdagi energiya yadrosi — XP/kuchning vizual ramzi, doim urib turadi */
-.hero-core {
-    fill: currentColor;
-    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
-    animation: corePulse 1.8s ease-in-out infinite;
-    transition: fill 0.6s ease;
-}
-
-@keyframes corePulse {
-    0%, 100% { opacity: 0.75; r: 11px; }
-    50% { opacity: 1; r: 14px; }
-}
-
-/* --- Zirh, qurol, plash, qanot, toj: standart holatda yashiringan --- */
+/* Bilaguzuk, peshonabog', vest, kubok, plash, toj — standart holatda yashiringan */
 .hero-armor,
+.hero-headband,
 .hero-chestplate,
 .hero-weapon,
 .hero-cape,
-.hero-wing,
 .hero-crown {
     fill: currentColor;
     opacity: 0;
@@ -242,55 +232,70 @@ body::before {
 }
 
 /* ============================================
-   TIER 1 — NOVICE (Level 1-2): xira, kamquvvat energiya
+   TIER 1 — NOVICE (Level 1-2): oddiy kiyim, yalang oyoq (rasmdagidek)
    ============================================ */
 .hero[data-tier="novice"] {
     --tier-color: #8a94a3;
-    filter: saturate(0.65) brightness(0.9);
 }
 
 /* ============================================
-   TIER 2 — FIGHTER (Level 3-5): yashil energiya, elka zirhi paydo bo'ladi
+   TIER 2 — FIGHTER (Level 3-6): sport formasi, krossovka, bilaguzuklar
    ============================================ */
 .hero[data-tier="fighter"] {
     --tier-color: #00e676;
 }
+.hero[data-tier="fighter"] .hero-foot {
+    opacity: 0;
+}
+.hero[data-tier="fighter"] .hero-shoe {
+    opacity: 1;
+}
 .hero[data-tier="fighter"] .hero-armor {
     opacity: 1;
-    transform: scale(0.92);
+    transform: scale(1);
 }
 
 /* ============================================
-   TIER 3 — WARRIOR (Level 6-9): to'liq zirh + energiya qilich
+   TIER 3 — WARRIOR (Level 7-14): sport jaketi + peshonabog'
    ============================================ */
 .hero[data-tier="warrior"] {
     --tier-color: #ff7b00;
 }
-.hero[data-tier="warrior"] .hero-armor {
-    opacity: 1;
-    transform: scale(1.12);
+.hero[data-tier="warrior"] .hero-foot {
+    opacity: 0;
 }
-.hero[data-tier="warrior"] .hero-chestplate,
-.hero[data-tier="warrior"] .hero-weapon {
+.hero[data-tier="warrior"] .hero-shoe {
+    opacity: 1;
+}
+.hero[data-tier="warrior"] .hero-armor {
     opacity: 1;
     transform: scale(1);
 }
-.hero[data-tier="warrior"] .hero-fist {
-    stroke-width: 4;
+.hero[data-tier="warrior"] .hero-chestplate,
+.hero[data-tier="warrior"] .hero-headband {
+    opacity: 1;
+    transform: scale(1);
 }
 
 /* ============================================
-   TIER 4 — LEGEND (Level 10+): oltin zirh, plash, qanot, toj, aylanuvchi nurlar
+   TIER 4 — LEGEND (Level 15+): oltin chempion kiyimi, plash, toj, kubok
    ============================================ */
 .hero[data-tier="legend"] {
     --tier-color: #ffd700;
     filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.55));
 }
-.hero[data-tier="legend"] .hero-armor {
-    opacity: 1;
-    transform: scale(1.28);
+.hero[data-tier="legend"] .hero-foot {
+    opacity: 0;
 }
-.hero[data-tier="legend"] .hero-chestplate,
+.hero[data-tier="legend"] .hero-shoe {
+    opacity: 1;
+}
+.hero[data-tier="legend"] .hero-armor,
+.hero[data-tier="legend"] .hero-headband,
+.hero[data-tier="legend"] .hero-chestplate {
+    opacity: 1;
+    transform: scale(1.05);
+}
 .hero[data-tier="legend"] .hero-weapon,
 .hero[data-tier="legend"] .hero-crown {
     opacity: 1;
@@ -301,12 +306,6 @@ body::before {
     transform: scale(1);
     animation: capeSway 3s ease-in-out infinite;
 }
-.hero[data-tier="legend"] .hero-wing {
-    opacity: 0.85;
-    transform: scale(1);
-    animation: wingFlutter 2.4s ease-in-out infinite;
-}
-.hero[data-tier="legend"] .hero-wing--right { animation-delay: 0.15s; }
 .hero[data-tier="legend"] .hero-weapon {
     filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 22px currentColor);
 }
@@ -316,10 +315,6 @@ body::before {
     50% { transform: scale(1) skewX(3deg); }
 }
 
-@keyframes wingFlutter {
-    0%, 100% { transform: scale(1) rotateY(0deg); }
-    50% { transform: scale(1.04) rotateY(10deg); }
-}
 
 /* --- "EVOLYUTSIYA" PORTLASHI — daraja oshganda bir martalik effekt (JS orqali qo'shiladi) --- */
 .hero.hero--evolving {
@@ -707,6 +702,94 @@ body::before {
 .medal-gold { color: var(--game-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
 .medal-silver { color: #c0c0c0; }
 .medal-bronze { color: #cd7f32; }
+
+/* 10. DO'KON (SHOP) */
+.coins-display {
+    margin-top: 10px;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--game-gold);
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.35);
+}
+
+.shop-slot-title {
+    width: 100%;
+    margin: 18px 0 10px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+.shop-item {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.shop-item__swatch {
+    height: 56px;
+    width: 100%;
+}
+
+.shop-item__info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shop-item__name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.shop-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.shop-btn:active {
+    transform: scale(0.95);
+}
+
+.shop-btn--buy {
+    background: var(--game-orange);
+    color: #0d0f0d;
+}
+
+.shop-btn--buy:disabled {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.shop-btn--equip {
+    background: var(--game-green);
+    color: #0d0f0d;
+}
+
+.shop-btn--equipped {
+    background: rgba(0, 230, 118, 0.15);
+    color: var(--game-green);
+    cursor: default;
+}
 
 /* Scrollbar stillarni yashirish */
 .page::-webkit-scrollbar {

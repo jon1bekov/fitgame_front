@@ -50,19 +50,19 @@ export async function fetchLeaderboard() {
 }
 
 /**
- * Bajarilgan mashq natijasini (XP) bazaga yuboradi.
- * @returns {object} — { telegram_id, total_xp, level }
+ * Bajarilgan mashq natijasini (XP + reps) bazaga yuboradi.
+ * @returns {object} — { telegram_id, total_xp, level, coins }
  * @throws {Error} — server xatoligi yoki tarmoq muammosi bo'lsa,
  *                    xabar ichida aniq status kodi va server javobi bo'ladi
  */
-export async function submitWorkoutResult(tgId, xp) {
+export async function submitWorkoutResult(tgId, xp, reps) {
     const response = await fetch(`${API_BASE_URL}/api/user/add_xp`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             ...DEFAULT_HEADERS,
         },
-        body: JSON.stringify({ telegram_id: tgId, xp }),
+        body: JSON.stringify({ telegram_id: tgId, xp, reps }),
     });
 
     if (!response.ok) {
@@ -72,6 +72,73 @@ export async function submitWorkoutResult(tgId, xp) {
 
     const res = await response.json();
     if (res.status !== 'success') {
+        throw new Error(res.message || "Noma'lum xatolik");
+    }
+
+    return res.data;
+}
+
+/**
+ * Do'kondagi barcha mahsulotlar katalogini oladi.
+ * @returns {Array} — [{ id, name, slot, price, color }, ...]
+ */
+export async function fetchShopItems() {
+    const response = await fetch(`${API_BASE_URL}/api/shop/items`, {
+        headers: DEFAULT_HEADERS,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Server xatoligi: ${response.status}`);
+    }
+
+    const res = await response.json();
+    if (res.status !== 'success') {
+        throw new Error(res.message || "Noma'lum xatolik");
+    }
+
+    return res.data;
+}
+
+/**
+ * Tangalarga mahsulot sotib oladi.
+ * @returns {object} — { coins, owned_items }
+ * @throws {Error} — tangalar yetmasa yoki boshqa xatolik bo'lsa
+ */
+export async function buyShopItem(tgId, itemId) {
+    const response = await fetch(`${API_BASE_URL}/api/shop/buy`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...DEFAULT_HEADERS,
+        },
+        body: JSON.stringify({ telegram_id: tgId, item_id: itemId }),
+    });
+
+    const res = await response.json();
+    if (!response.ok || res.status !== 'success') {
+        throw new Error(res.message || "Noma'lum xatolik");
+    }
+
+    return res.data;
+}
+
+/**
+ * Sotib olingan mahsulotni personajga kiydiradi.
+ * @returns {object} — { equipped_items }
+ * @throws {Error} — mahsulot sotib olinmagan bo'lsa yoki boshqa xatolik
+ */
+export async function equipShopItem(tgId, itemId) {
+    const response = await fetch(`${API_BASE_URL}/api/shop/equip`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...DEFAULT_HEADERS,
+        },
+        body: JSON.stringify({ telegram_id: tgId, item_id: itemId }),
+    });
+
+    const res = await response.json();
+    if (!response.ok || res.status !== 'success') {
         throw new Error(res.message || "Noma'lum xatolik");
     }
 
