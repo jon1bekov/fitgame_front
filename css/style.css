@@ -171,10 +171,10 @@ body::before {
     width: 168px;
     height: 220px;
     --tier-color: #8a94a3;
-    /* Do'kondan hech narsa sotib olinmagan/kiyilmagan bo'lsa, standart gradient ko'rinishda qoladi */
-    --shirt-color: url(#suitGrad);
-    --shorts-color: url(#suitGrad);
-    --shoes-color: url(#suitGrad);
+    /* Do'kondan hech narsa sotib olinmagan bo'lsa, standart yashil gradient ko'rinishda qoladi */
+    --leaves-color: url(#leafGrad);
+    --flowers-color: #ffb6c1;
+    --pot-color: #c1662f;
     color: var(--tier-color);
     animation: heroFloat 3.4s ease-in-out infinite;
     transition: filter 0.6s ease;
@@ -183,7 +183,7 @@ body::before {
 
 @keyframes heroFloat {
     0%, 100% { transform: translateY(0) rotateZ(0deg); }
-    50% { transform: translateY(-10px) rotateZ(1deg); }
+    50% { transform: translateY(-8px) rotateZ(0.5deg); }
 }
 
 .hero__svg {
@@ -194,127 +194,105 @@ body::before {
     display: block;
 }
 
-/* --- Tananing asosiy qismlari (barcha darajalarda mavjud) --- */
-.hero-torso { filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25)); }
-.hero-head { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2)); }
-.hero-arm, .hero-leg { filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.15)); }
-.hero-hair-back, .hero-hair-front { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25)); }
-
-/* Yalang oyoq — standart (NOVICE) holatda ko'rinadi */
-.hero-foot {
-    opacity: 1;
-    transition: opacity 0.4s ease;
+/* --- Gulston va tuproq (doim ko'rinadi, o'sish bilan bog'liq emas) --- */
+.hero-pot {
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.3));
 }
 
-/* Krossovka — standart holatda yashiringan, FIGHTER dan boshlab yalang oyoqni yopadi */
-.hero-shoe {
+/* --- Ildizlar — faqat LEGEND darajada porlab ko'rinadi --- */
+.hero-roots {
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.6s ease;
 }
 
-/* Bilaguzuk, peshonabog', vest, kubok, plash, toj — standart holatda yashiringan */
-.hero-armor,
-.hero-headband,
-.hero-chestplate,
-.hero-weapon,
-.hero-cape,
-.hero-crown {
+/* --- O'SUVCHI QISM: butun daraxt (tana + barglar) daraja oshgani sari kattalashadi ---
+   MUHIM: transform-origin gulston tuprog'iga (pastki nuqtaga) qo'yilgan, shuning uchun
+   daraxt doim gulstondan "o'sib chiqayotgandek" ko'rinadi, markazdan emas. */
+.hero-plant {
+    transform-box: view-box;
+    transform-origin: 100px 234px;
+    transition: transform 0.7s cubic-bezier(0.34, 1.2, 0.4, 1);
+}
+
+.hero-trunk {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.hero-canopy {
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2));
+    transition: fill 0.6s ease;
+}
+
+/* Gullar va mevalar — standart holatda yashiringan */
+.hero-flowers,
+.hero-fruit {
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.hero-fruit {
     fill: currentColor;
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-    transform: scale(0.85);
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.hero-weapon {
-    filter: drop-shadow(0 0 8px currentColor);
+    filter: drop-shadow(0 0 6px currentColor);
 }
 
 /* ============================================
-   TIER 1 — NOVICE (Level 1-2): oddiy kiyim, yalang oyoq (rasmdagidek)
+   TIER 1 — NOVICE (Level 1-2): kichkina niholcha
    ============================================ */
 .hero[data-tier="novice"] {
     --tier-color: #8a94a3;
 }
+.hero[data-tier="novice"] .hero-plant {
+    transform: scale(0.32);
+}
 
 /* ============================================
-   TIER 2 — FIGHTER (Level 3-6): sport formasi, krossovka, bilaguzuklar
+   TIER 2 — FIGHTER (Level 3-6): yosh, sog'lom daraxtcha
    ============================================ */
 .hero[data-tier="fighter"] {
     --tier-color: #00e676;
 }
-.hero[data-tier="fighter"] .hero-foot {
-    opacity: 0;
-}
-.hero[data-tier="fighter"] .hero-shoe {
-    opacity: 1;
-}
-.hero[data-tier="fighter"] .hero-armor {
-    opacity: 1;
-    transform: scale(1);
+.hero[data-tier="fighter"] .hero-plant {
+    transform: scale(0.58);
 }
 
 /* ============================================
-   TIER 3 — WARRIOR (Level 7-14): sport jaketi + peshonabog'
+   TIER 3 — WARRIOR (Level 7-14): katta, gullab turgan daraxt
    ============================================ */
 .hero[data-tier="warrior"] {
     --tier-color: #ff7b00;
 }
-.hero[data-tier="warrior"] .hero-foot {
-    opacity: 0;
+.hero[data-tier="warrior"] .hero-plant {
+    transform: scale(0.82);
 }
-.hero[data-tier="warrior"] .hero-shoe {
+.hero[data-tier="warrior"] .hero-flowers {
     opacity: 1;
-}
-.hero[data-tier="warrior"] .hero-armor {
-    opacity: 1;
-    transform: scale(1);
-}
-.hero[data-tier="warrior"] .hero-chestplate,
-.hero[data-tier="warrior"] .hero-headband {
-    opacity: 1;
-    transform: scale(1);
 }
 
 /* ============================================
-   TIER 4 — LEGEND (Level 15+): oltin chempion kiyimi, plash, toj, kubok
+   TIER 4 — LEGEND (Level 15+): afsonaviy, porlab turgan daraxt
    ============================================ */
 .hero[data-tier="legend"] {
     --tier-color: #ffd700;
-    filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.55));
+    filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.5));
 }
-.hero[data-tier="legend"] .hero-foot {
-    opacity: 0;
-}
-.hero[data-tier="legend"] .hero-shoe {
-    opacity: 1;
-}
-.hero[data-tier="legend"] .hero-armor,
-.hero[data-tier="legend"] .hero-headband,
-.hero[data-tier="legend"] .hero-chestplate {
-    opacity: 1;
-    transform: scale(1.05);
-}
-.hero[data-tier="legend"] .hero-weapon,
-.hero[data-tier="legend"] .hero-crown {
-    opacity: 1;
-    transform: scale(1.1);
-}
-.hero[data-tier="legend"] .hero-cape {
-    opacity: 0.92;
+.hero[data-tier="legend"] .hero-plant {
     transform: scale(1);
-    animation: capeSway 3s ease-in-out infinite;
 }
-.hero[data-tier="legend"] .hero-weapon {
-    filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 22px currentColor);
+.hero[data-tier="legend"] .hero-flowers {
+    opacity: 1;
+}
+.hero[data-tier="legend"] .hero-fruit {
+    opacity: 1;
+    animation: fruitGlow 2.2s ease-in-out infinite;
+}
+.hero[data-tier="legend"] .hero-roots {
+    opacity: 0.8;
 }
 
-@keyframes capeSway {
-    0%, 100% { transform: scale(1) skewX(0deg); }
-    50% { transform: scale(1) skewX(3deg); }
+@keyframes fruitGlow {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.25); }
 }
-
 
 /* --- "EVOLYUTSIYA" PORTLASHI — daraja oshganda bir martalik effekt (JS orqali qo'shiladi) --- */
 .hero.hero--evolving {

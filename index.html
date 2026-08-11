@@ -25,84 +25,56 @@
                 <div class="hero__spark hero__spark--4"></div>
                 <svg class="hero__svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#ffd9b3"/>
-                            <stop offset="100%" stop-color="#f0b586"/>
+                        <linearGradient id="trunkGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#9a6a3f"/>
+                            <stop offset="100%" stop-color="#5c3a1e"/>
                         </linearGradient>
-                        <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#5b3a29"/>
-                            <stop offset="100%" stop-color="#3b2418"/>
+                        <linearGradient id="leafGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#7ed957"/>
+                            <stop offset="100%" stop-color="#2e9e4f"/>
                         </linearGradient>
                     </defs>
 
-                    <!-- Plash (faqat LEGEND) -->
-                    <path class="hero-cape hero-cape--left" d="M66,104 Q40,160 54,240 Q70,204 76,150 Z"/>
-                    <path class="hero-cape hero-cape--right" d="M134,104 Q160,160 146,240 Q130,204 124,150 Z"/>
+                    <!-- Ildizlar — porlaydi (faqat LEGEND) -->
+                    <path class="hero-roots" d="M84,238 Q66,246 54,258" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path class="hero-roots" d="M100,240 Q100,252 96,266" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path class="hero-roots" d="M116,238 Q134,246 146,258" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
 
-                    <!-- Oyoqlar (teri) -->
-                    <path class="hero-leg" fill="url(#skinGrad)" d="M78,210 L96,210 L94,252 L80,252 Z"/>
-                    <path class="hero-leg" fill="url(#skinGrad)" d="M122,210 L104,210 L106,252 L120,252 Z"/>
-                    <!-- Yalang oyoq (NOVICE, standart) -->
-                    <ellipse class="hero-foot" fill="url(#skinGrad)" cx="82" cy="258" rx="15" ry="8"/>
-                    <ellipse class="hero-foot" fill="url(#skinGrad)" cx="118" cy="258" rx="15" ry="8"/>
-                    <!-- Krossovka (FIGHTER dan boshlab, yalang oyoqni yopadi) -->
-                    <rect class="hero-shoe" fill="var(--shoes-color)" x="66" y="250" width="32" height="15" rx="7"/>
-                    <rect class="hero-shoe" fill="var(--shoes-color)" x="102" y="250" width="32" height="15" rx="7"/>
+                    <!-- Gulston (do'kondan tanlangan rang) -->
+                    <path class="hero-pot" fill="var(--pot-color)" d="M66,234 L134,234 L124,272 L76,272 Z"/>
+                    <rect class="hero-pot" fill="var(--pot-color)" x="60" y="226" width="80" height="14" rx="6"/>
+                    <!-- Tuproq -->
+                    <ellipse fill="#4a3222" cx="100" cy="234" rx="34" ry="7"/>
 
-                    <!-- Shim (do'kondan tanlangan rang) -->
-                    <path class="hero-shorts" fill="var(--shorts-color)" d="M72,180 L128,180 L124,214 L104,214 L100,200 L96,214 L76,214 Z"/>
+                    <!-- O'SUVCHI QISM: daraxtning o'zi — level bo'yicha butunlay masshtabda o'sadi -->
+                    <g class="hero-plant">
+                        <!-- Tanasi -->
+                        <path class="hero-trunk" fill="url(#trunkGrad)" d="M93,234 L93,140 Q93,134 100,134 Q107,134 107,140 L107,234 Z"/>
 
-                    <!-- Qo'llar (teri) -->
-                    <path class="hero-arm hero-arm--left" fill="url(#skinGrad)" d="M66,110 Q46,132 44,178 Q43,189 53,189 Q61,189 60,178 Q62,140 78,116 Z"/>
-                    <path class="hero-arm hero-arm--right" fill="url(#skinGrad)" d="M134,110 Q154,132 156,178 Q157,189 147,189 Q139,189 140,178 Q138,140 122,116 Z"/>
-                    <circle class="hero-fist" fill="url(#skinGrad)" cx="48" cy="183" r="10"/>
-                    <circle class="hero-fist" fill="url(#skinGrad)" cx="152" cy="183" r="10"/>
-                    <!-- Bilaguzuklar (FIGHTER dan boshlab) -->
-                    <rect class="hero-armor" x="40" y="173" width="16" height="6" rx="3"/>
-                    <rect class="hero-armor" x="144" y="173" width="16" height="6" rx="3"/>
+                        <!-- Bargli tepa qism (bulutsimon "lollipop" shakl) -->
+                        <g class="hero-canopy" fill="var(--leaves-color)">
+                            <circle cx="100" cy="60" r="27"/>
+                            <circle cx="70" cy="82" r="26"/>
+                            <circle cx="130" cy="82" r="26"/>
+                            <circle cx="85" cy="108" r="24"/>
+                            <circle cx="115" cy="108" r="24"/>
+                            <circle cx="100" cy="92" r="30"/>
+                        </g>
 
-                    <!-- Futbolka (do'kondan tanlangan rang) -->
-                    <path class="hero-torso" fill="var(--shirt-color)" d="M64,112 Q64,102 76,102 L124,102 Q136,102 136,112 L130,182 Q129,192 118,192 L82,192 Q71,192 70,182 Z"/>
-                    <!-- Sport jaketi/vest (WARRIOR va LEGEND) -->
-                    <path class="hero-chestplate" d="M78,106 L122,106 L118,150 L100,158 L82,150 Z"/>
-                    <!-- Kubok — chempionlik belgisi (faqat LEGEND) -->
-                    <g class="hero-weapon">
-                        <path d="M142,146 Q142,132 152,132 L162,132 Q172,132 172,146 Q172,156 162,158 L152,158 Q142,156 142,146 Z"/>
-                        <rect x="154" y="158" width="8" height="10"/>
-                        <rect x="148" y="168" width="20" height="6" rx="2"/>
+                        <!-- Gullar (WARRIOR va LEGEND) -->
+                        <circle class="hero-flowers" fill="var(--flowers-color)" cx="62" cy="78" r="6"/>
+                        <circle class="hero-flowers" fill="var(--flowers-color)" cx="138" cy="78" r="6"/>
+                        <circle class="hero-flowers" fill="var(--flowers-color)" cx="78" cy="52" r="6"/>
+                        <circle class="hero-flowers" fill="var(--flowers-color)" cx="122" cy="52" r="6"/>
+                        <circle class="hero-flowers" fill="var(--flowers-color)" cx="100" cy="38" r="6"/>
+
+                        <!-- Porlovchi mevalar (faqat LEGEND) -->
+                        <circle class="hero-fruit" cx="75" cy="95" r="5"/>
+                        <circle class="hero-fruit" cx="125" cy="95" r="5"/>
+                        <circle class="hero-fruit" cx="100" cy="70" r="5"/>
+                        <circle class="hero-fruit" cx="88" cy="118" r="5"/>
+                        <circle class="hero-fruit" cx="112" cy="118" r="5"/>
                     </g>
-
-                    <!-- Bo'yin -->
-                    <rect class="hero-neck" fill="url(#skinGrad)" x="90" y="100" width="20" height="14" rx="4"/>
-
-                    <!-- Soch (orqa qism, boshdan oldin chiziladi) -->
-                    <path class="hero-hair-back" fill="url(#hairGrad)" d="M56,66 Q50,18 100,14 Q150,18 144,66 Q150,54 146,40 Q132,16 100,16 Q68,16 54,40 Q50,54 56,66 Z"/>
-                    <!-- Quloqlar -->
-                    <ellipse fill="url(#skinGrad)" cx="58" cy="68" rx="7" ry="10"/>
-                    <ellipse fill="url(#skinGrad)" cx="142" cy="68" rx="7" ry="10"/>
-                    <!-- Bosh (yuz) -->
-                    <circle class="hero-head" fill="url(#skinGrad)" cx="100" cy="64" r="40"/>
-                    <!-- Qoshlar -->
-                    <rect fill="url(#hairGrad)" x="74" y="58" width="16" height="4" rx="2"/>
-                    <rect fill="url(#hairGrad)" x="110" y="58" width="16" height="4" rx="2"/>
-                    <!-- Ko'zlar -->
-                    <circle fill="#ffffff" cx="82" cy="70" r="8"/>
-                    <circle fill="#3b6dc4" cx="82" cy="70" r="4.6"/>
-                    <circle fill="#ffffff" cx="80" cy="68" r="1.6"/>
-                    <circle fill="#ffffff" cx="118" cy="70" r="8"/>
-                    <circle fill="#3b6dc4" cx="118" cy="70" r="4.6"/>
-                    <circle fill="#ffffff" cx="116" cy="68" r="1.6"/>
-                    <!-- Qizarish (lunj) -->
-                    <circle fill="#ff9e9e" opacity="0.55" cx="70" cy="84" r="6"/>
-                    <circle fill="#ff9e9e" opacity="0.55" cx="130" cy="84" r="6"/>
-                    <!-- Tabassum -->
-                    <path fill="none" stroke="#7a4a33" stroke-width="3" stroke-linecap="round" d="M90,92 Q100,99 110,92"/>
-                    <!-- Peshonabog' (WARRIOR va LEGEND) -->
-                    <rect class="hero-headband" x="68" y="44" width="64" height="8" rx="4"/>
-                    <!-- Soch (old qism, peshona ustida) -->
-                    <path class="hero-hair-front" fill="url(#hairGrad)" d="M60,48 Q66,20 100,18 Q134,20 140,48 Q128,28 100,28 Q72,28 60,48 Z"/>
-                    <!-- Toj (faqat LEGEND) -->
-                    <path class="hero-crown" d="M78,10 L86,22 L100,6 L114,22 L122,10 L118,26 L82,26 Z"/>
                 </svg>
             </div>
             <div class="character-stage"></div>

@@ -9,9 +9,9 @@ import { updateProfileUI, applyEquippedItems } from './profile.js';
 import { calculateLevel } from './config.js';
 
 const SLOT_LABELS = {
-    shirt: '👕 Futbolkalar',
-    shorts: '🩳 Shimlar',
-    shoes: '👟 Krossovkalar',
+    leaves: '🍃 Barglar',
+    flowers: '🌸 Gullar',
+    pot: '🪴 Gulston',
 };
 
 /** Bitta mahsulot uchun HTML kartochka yasaydi. */
@@ -77,7 +77,7 @@ export async function loadShop() {
         if (coinsHeader) coinsHeader.innerText = `🪙 ${userState.coins}`;
 
         // Mahsulotlarni slot bo'yicha guruhlab chizamiz
-        const slots = ['shirt', 'shorts', 'shoes'];
+        const slots = ['leaves', 'flowers', 'pot'];
         let html = '';
         for (const slot of slots) {
             const slotItems = items.filter((i) => i.slot === slot);
