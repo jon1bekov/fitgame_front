@@ -5,7 +5,7 @@
 // ============================================
 
 // Backend (Flask) API manzili. Ngrok qayta ishga tushirilsa, shu yerni yangilang.
-export const API_BASE_URL = 'https://impound-encrypt-lullaby.ngrok-free.dev';
+export const API_BASE_URL = 'https://16.170.156.12.sslip.io';
 
 // O'yin balansi
 export const XP_PER_REPETITION = 2; // Har bir to'g'ri squat uchun XP
