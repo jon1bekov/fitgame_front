@@ -5,7 +5,7 @@
 // ============================================
 
 import { API_BASE_URL } from './config.js';
-import { getInitData } from './telegram.js';
+import { getInitData, getTelegramUserId } from './telegram.js';
 
 // Ngrok bepul domenlar ba'zan JSON o'rniga HTML ogohlantirish sahifasini
 // qaytaradi — bu header shu holatni oldini oladi.
@@ -16,8 +16,7 @@ const DEFAULT_HEADERS = {
 /**
  * Holatni O'ZGARTIRADIGAN so'rovlar (XP qo'shish, xarid, kiyish) uchun
  * autentifikatsiya headeri. Backend shu qiymatni Telegram bot tokeni bilan
- * tekshiradi va HAQIQIY telegram_id'ni shundan oladi — mijoz (frontend)
- * boshqa hech qanday telegram_id yubormaydi, chunki unga ishonib bo'lmaydi.
+ * tekshiradi va HAQIQIY telegram_id'ni shundan oladi.
  */
 function authHeaders() {
     return {
@@ -73,10 +72,17 @@ export async function fetchLeaderboard() {
  *                    xabar ichida aniq status kodi va server javobi bo'ladi
  */
 export async function submitWorkoutResult(xp, reps) {
+    const initData = getInitData();
+    const body = { xp, reps };
+    if (!initData) {
+        const tgId = getTelegramUserId();
+        if (tgId) body.telegram_id = tgId;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/user/add_xp`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ xp, reps }),
+        body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -119,10 +125,17 @@ export async function fetchShopItems() {
  * @throws {Error} — tangalar yetmasa yoki boshqa xatolik bo'lsa
  */
 export async function buyShopItem(itemId) {
+    const initData = getInitData();
+    const body = { item_id: itemId };
+    if (!initData) {
+        const tgId = getTelegramUserId();
+        if (tgId) body.telegram_id = tgId;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/shop/buy`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ item_id: itemId }),
+        body: JSON.stringify(body),
     });
 
     const res = await response.json();
@@ -139,10 +152,17 @@ export async function buyShopItem(itemId) {
  * @throws {Error} — mahsulot sotib olinmagan bo'lsa yoki boshqa xatolik
  */
 export async function equipShopItem(itemId) {
+    const initData = getInitData();
+    const body = { item_id: itemId };
+    if (!initData) {
+        const tgId = getTelegramUserId();
+        if (tgId) body.telegram_id = tgId;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/shop/equip`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ item_id: itemId }),
+        body: JSON.stringify(body),
     });
 
     const res = await response.json();
