@@ -65,7 +65,7 @@ export async function endWorkout() {
     const totalXpEarned = count * XP_PER_REPETITION;
 
     try {
-        const data = await submitWorkoutResult(tgId, totalXpEarned, count);
+        const data = await submitWorkoutResult(totalXpEarned, count);
 
         hapticNotify('success');
         updateProfileUI(data.total_xp, data.level, data.coins); // Profilni qayta so'rovsiz darhol yangilaymiz

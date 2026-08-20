@@ -106,13 +106,13 @@ async function handleShopAction(action, itemId) {
 
     try {
         if (action === 'buy') {
-            const result = await buyShopItem(tgId, itemId);
+            const result = await buyShopItem(itemId);
             hapticNotify('success');
             // Coins darhol yangilanadi (profil sahifasida ham)
             const profile = await fetchUserProfile(tgId);
             if (profile) updateProfileUI(profile.xp, calculateLevel(profile.xp), result.coins);
         } else if (action === 'equip') {
-            const result = await equipShopItem(tgId, itemId);
+            const result = await equipShopItem(itemId);
             hapticNotify('success');
             applyEquippedItems(result.equipped_items);
         }

@@ -5,12 +5,27 @@
 // ============================================
 
 import { API_BASE_URL } from './config.js';
+import { getInitData } from './telegram.js';
 
 // Ngrok bepul domenlar ba'zan JSON o'rniga HTML ogohlantirish sahifasini
 // qaytaradi — bu header shu holatni oldini oladi.
 const DEFAULT_HEADERS = {
     'ngrok-skip-browser-warning': 'true',
 };
+
+/**
+ * Holatni O'ZGARTIRADIGAN so'rovlar (XP qo'shish, xarid, kiyish) uchun
+ * autentifikatsiya headeri. Backend shu qiymatni Telegram bot tokeni bilan
+ * tekshiradi va HAQIQIY telegram_id'ni shundan oladi — mijoz (frontend)
+ * boshqa hech qanday telegram_id yubormaydi, chunki unga ishonib bo'lmaydi.
+ */
+function authHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': getInitData(),
+        ...DEFAULT_HEADERS,
+    };
+}
 
 /**
  * Foydalanuvchi profilini oladi.
@@ -51,18 +66,17 @@ export async function fetchLeaderboard() {
 
 /**
  * Bajarilgan mashq natijasini (XP + reps) bazaga yuboradi.
+ * MUHIM: telegram_id endi yuborilmaydi — backend uni tasdiqlangan
+ * initData'dan o'zi oladi (xavfsizlik uchun).
  * @returns {object} — { telegram_id, total_xp, level, coins }
  * @throws {Error} — server xatoligi yoki tarmoq muammosi bo'lsa,
  *                    xabar ichida aniq status kodi va server javobi bo'ladi
  */
-export async function submitWorkoutResult(tgId, xp, reps) {
+export async function submitWorkoutResult(xp, reps) {
     const response = await fetch(`${API_BASE_URL}/api/user/add_xp`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...DEFAULT_HEADERS,
-        },
-        body: JSON.stringify({ telegram_id: tgId, xp, reps }),
+        headers: authHeaders(),
+        body: JSON.stringify({ xp, reps }),
     });
 
     if (!response.ok) {
@@ -100,18 +114,15 @@ export async function fetchShopItems() {
 }
 
 /**
- * Tangalarga mahsulot sotib oladi.
+ * Tangalarga mahsulot sotib oladi. (telegram_id backend'da initData'dan olinadi)
  * @returns {object} — { coins, owned_items }
  * @throws {Error} — tangalar yetmasa yoki boshqa xatolik bo'lsa
  */
-export async function buyShopItem(tgId, itemId) {
+export async function buyShopItem(itemId) {
     const response = await fetch(`${API_BASE_URL}/api/shop/buy`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...DEFAULT_HEADERS,
-        },
-        body: JSON.stringify({ telegram_id: tgId, item_id: itemId }),
+        headers: authHeaders(),
+        body: JSON.stringify({ item_id: itemId }),
     });
 
     const res = await response.json();
@@ -123,18 +134,15 @@ export async function buyShopItem(tgId, itemId) {
 }
 
 /**
- * Sotib olingan mahsulotni personajga kiydiradi.
+ * Sotib olingan mahsulotni personajga kiydiradi. (telegram_id backend'da initData'dan olinadi)
  * @returns {object} — { equipped_items }
  * @throws {Error} — mahsulot sotib olinmagan bo'lsa yoki boshqa xatolik
  */
-export async function equipShopItem(tgId, itemId) {
+export async function equipShopItem(itemId) {
     const response = await fetch(`${API_BASE_URL}/api/shop/equip`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...DEFAULT_HEADERS,
-        },
-        body: JSON.stringify({ telegram_id: tgId, item_id: itemId }),
+        headers: authHeaders(),
+        body: JSON.stringify({ item_id: itemId }),
     });
 
     const res = await response.json();

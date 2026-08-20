@@ -24,6 +24,16 @@ export function getTelegramUserId() {
     return null;
 }
 
+/**
+ * Telegram'ning RAQAMLI IMZOLANGAN xom initData satrini qaytaradi.
+ * MUHIM: bu — `initDataUnsafe`dan farqli o'laroq — backend tomonidan
+ * TEKSHIRILADIGAN yagona ma'lumot. Holatni o'zgartiradigan har bir so'rovda
+ * (XP qo'shish, do'kondan xarid) shu qiymat yuborilishi SHART.
+ */
+export function getInitData() {
+    return tg?.initData || '';
+}
+
 /** Yengil vibratsiya (masalan, mashq bosqichi o'zgarganda) */
 export function haptic(type = 'light') {
     tg?.HapticFeedback?.impactOccurred(type);
