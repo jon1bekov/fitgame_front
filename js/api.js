@@ -72,12 +72,12 @@ export async function fetchLeaderboard() {
  *                    xabar ichida aniq status kodi va server javobi bo'ladi
  */
 export async function submitWorkoutResult(xp, reps) {
-    const initData = getInitData();
-    const body = { xp, reps };
-    if (!initData) {
-        const tgId = getTelegramUserId();
-        if (tgId) body.telegram_id = tgId;
-    }
+    const tgId = getTelegramUserId();
+    const body = {
+        telegram_id: tgId,
+        xp,
+        reps,
+    };
 
     const response = await fetch(`${API_BASE_URL}/api/user/add_xp`, {
         method: 'POST',
@@ -120,17 +120,16 @@ export async function fetchShopItems() {
 }
 
 /**
- * Tangalarga mahsulot sotib oladi. (telegram_id backend'da initData'dan olinadi)
+ * Tangalarga mahsulot sotib oladi.
  * @returns {object} — { coins, owned_items }
  * @throws {Error} — tangalar yetmasa yoki boshqa xatolik bo'lsa
  */
 export async function buyShopItem(itemId) {
-    const initData = getInitData();
-    const body = { item_id: itemId };
-    if (!initData) {
-        const tgId = getTelegramUserId();
-        if (tgId) body.telegram_id = tgId;
-    }
+    const tgId = getTelegramUserId();
+    const body = {
+        telegram_id: tgId,
+        item_id: itemId,
+    };
 
     const response = await fetch(`${API_BASE_URL}/api/shop/buy`, {
         method: 'POST',
@@ -147,17 +146,16 @@ export async function buyShopItem(itemId) {
 }
 
 /**
- * Sotib olingan mahsulotni personajga kiydiradi. (telegram_id backend'da initData'dan olinadi)
+ * Sotib olingan mahsulotni personajga kiydiradi.
  * @returns {object} — { equipped_items }
  * @throws {Error} — mahsulot sotib olinmagan bo'lsa yoki boshqa xatolik
  */
 export async function equipShopItem(itemId) {
-    const initData = getInitData();
-    const body = { item_id: itemId };
-    if (!initData) {
-        const tgId = getTelegramUserId();
-        if (tgId) body.telegram_id = tgId;
-    }
+    const tgId = getTelegramUserId();
+    const body = {
+        telegram_id: tgId,
+        item_id: itemId,
+    };
 
     const response = await fetch(`${API_BASE_URL}/api/shop/equip`, {
         method: 'POST',
