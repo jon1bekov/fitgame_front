@@ -19,11 +19,19 @@ const DEFAULT_HEADERS = {
  * tekshiradi va HAQIQIY telegram_id'ni shundan oladi.
  */
 function authHeaders() {
-    return {
+    const initData = getInitData();
+    const headers = {
         'Content-Type': 'application/json',
-        'X-Telegram-Init-Data': getInitData(),
         ...DEFAULT_HEADERS,
     };
+    if (initData) {
+        headers['X-Telegram-Init-Data'] = initData;
+    }
+    const tgId = getTelegramUserId();
+    if (tgId) {
+        headers['X-Telegram-User-Id'] = String(tgId);
+    }
+    return headers;
 }
 
 /**
@@ -65,11 +73,7 @@ export async function fetchLeaderboard() {
 
 /**
  * Bajarilgan mashq natijasini (XP + reps) bazaga yuboradi.
- * MUHIM: telegram_id endi yuborilmaydi — backend uni tasdiqlangan
- * initData'dan o'zi oladi (xavfsizlik uchun).
- * @returns {object} — { telegram_id, total_xp, level, coins }
- * @throws {Error} — server xatoligi yoki tarmoq muammosi bo'lsa,
- *                    xabar ichida aniq status kodi va server javobi bo'ladi
+ * @returns {object} — { telegram_id, total_xp, level, coins, streak }
  */
 export async function submitWorkoutResult(xp, reps) {
     const tgId = getTelegramUserId();
@@ -87,7 +91,14 @@ export async function submitWorkoutResult(xp, reps) {
 
     if (!response.ok) {
         const bodyText = await response.text();
-        throw new Error(`Status: ${response.status}. Javob: ${bodyText}`);
+        let errMsg = `Status: ${response.status}`;
+        try {
+            const errJson = JSON.parse(bodyText);
+            if (errJson.message) errMsg = errJson.message;
+        } catch (e) {
+            errMsg = `${errMsg} (${bodyText})`;
+        }
+        throw new Error(errMsg);
     }
 
     const res = await response.json();

@@ -2,6 +2,10 @@
 // TELEGRAM WEBAPP — Telegram bilan bog'liq barcha narsa shu yerda
 // ============================================
 
+export function getTelegramApp() {
+    return window.Telegram?.WebApp;
+}
+
 export const tg = window.Telegram?.WebApp;
 
 /**
@@ -10,8 +14,9 @@ export const tg = window.Telegram?.WebApp;
  * topilmasa URL'dagi ?user_id= parametridan oladi (zaxira usul).
  */
 export function getTelegramUserId() {
-    if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id;
+    const webApp = window.Telegram?.WebApp;
+    if (webApp?.initDataUnsafe?.user?.id) {
+        return webApp.initDataUnsafe.user.id;
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -31,15 +36,18 @@ export function getTelegramUserId() {
  * (XP qo'shish, do'kondan xarid) shu qiymat yuborilishi SHART.
  */
 export function getInitData() {
-    return tg?.initData || '';
+    const webApp = window.Telegram?.WebApp;
+    return webApp?.initData || '';
 }
 
 /** Yengil vibratsiya (masalan, mashq bosqichi o'zgarganda) */
 export function haptic(type = 'light') {
-    tg?.HapticFeedback?.impactOccurred(type);
+    const webApp = window.Telegram?.WebApp;
+    webApp?.HapticFeedback?.impactOccurred(type);
 }
 
 /** Natija vibratsiyasi (muvaffaqiyat/xatolik) */
 export function hapticNotify(type = 'success') {
-    tg?.HapticFeedback?.notificationOccurred(type);
-}
+    const webApp = window.Telegram?.WebApp;
+    webApp?.HapticFeedback?.notificationOccurred(type);
+}
