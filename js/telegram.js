@@ -37,7 +37,38 @@ export function getTelegramUserId() {
  */
 export function getInitData() {
     const webApp = window.Telegram?.WebApp;
-    return webApp?.initData || '';
+    if (webApp?.initData && webApp.initData.length > 0) {
+        return webApp.initData;
+    }
+
+    // Hash dan (#tgWebAppData=...) olishga urinish
+    try {
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            const hashParams = new URLSearchParams(hash);
+            const tgData = hashParams.get('tgWebAppData');
+            if (tgData) {
+                return decodeURIComponent(tgData);
+            }
+        }
+    } catch (e) {
+        console.warn('Hash initData parse xatosi:', e);
+    }
+
+    // Query parametrlardan (?tgWebAppData=...) olishga urinish
+    try {
+        if (window.location.search) {
+            const searchParams = new URLSearchParams(window.location.search);
+            const tgData = searchParams.get('tgWebAppData');
+            if (tgData) {
+                return decodeURIComponent(tgData);
+            }
+        }
+    } catch (e) {
+        console.warn('Search initData parse xatosi:', e);
+    }
+
+    return '';
 }
 
 /** Yengil vibratsiya (masalan, mashq bosqichi o'zgarganda) */

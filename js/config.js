@@ -40,8 +40,10 @@ export function getLevelProgress(xp, level) {
     return { currentInLevel, neededForLevel, progressPercent };
 }
 
-// Squat aniqlash sozlamalari (Anti-Hack)
-export const MIN_SQUAT_DURATION = 1200;   // ms — juda tez harakatni rad etish
-export const SQUAT_ANGLE_LIMIT = 100;     // O'tirish burchagi (shundan kichik)
-export const STAND_ANGLE_LIMIT = 160;     // Turish burchagi (shundan katta)
-export const VISIBILITY_THRESHOLD = 0.5;  // Tana a'zolari ko'rinish sharti (real qurilmalarda 0.8 juda qattiq edi)
+// Squat aniqlash va To'g'ri Forma sozlamalari (Anti-Cheat & Posture Check)
+export const MIN_SQUAT_DURATION = 750;     // ms — mashqlar orasidagi minimal oraliq
+export const SQUAT_KNEE_ANGLE = 95;        // To'liq o'tirish burchagi (95° dan kichik bo'lishi shart)
+export const STAND_KNEE_ANGLE = 160;       // To'liq tik turish burchagi (160° dan katta bo'lishi shart)
+export const MAX_HIP_DROP_RATIO = 0.35;    // Chanoq va tizza vertikal nisbati (son gorizontal bo'lishi shart)
+export const MIN_HIP_ANGLE = 50;           // Belni haddan tashqari bukib yuborishni cheklash (Good Morning oldini olish)
+export const VISIBILITY_THRESHOLD = 0.5;   // Tana a'zolari ko'rinish sharti
